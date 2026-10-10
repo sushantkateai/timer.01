@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DarkClock Pro — Free Online Clock, Timer, Stopwatch & Alarm</title>
+<meta name="description" content="A precise free online clock with countdown timer, stopwatch, online alarm clock and world clock. Fast, minimal, private — no sign-up required." />
+<meta name="theme-color" content="#050505" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='1.5' y='1.5' width='21' height='21' rx='6' fill='%23050505'/%3E%3Ccircle cx='12' cy='12' r='6.5' fill='none' stroke='%234388FF' stroke-width='1.6'/%3E%3Cpath d='M12 8.5V12l2.6 1.7' stroke='%234388FF' stroke-width='1.6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="DarkClock Pro" />
+<meta property="og:title" content="DarkClock Pro — Free Online Clock, Timer, Stopwatch & Alarm" />
+<meta property="og:description" content="Large digital clock, countdown timer with notifications, millisecond stopwatch, alarm with snooze and a world clock. Free, private, no account." />
+<meta name="twitter:card" content="summary" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"DarkClock Pro","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Free online clock with countdown timer, stopwatch, alarm clock and world clock."}
+</script>
+
+<!-- Apply saved theme before first paint (no flash) -->
+<script>try{var s=JSON.parse(localStorage.getItem('dcp.settings'));if(s&&s.theme==='light')document.documentElement.dataset.theme='light';}catch(e){}</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: { bg:'var(--bg)', card:'var(--card)', card2:'var(--card2)', line:'var(--line)', line2:'var(--line2)', ink:'var(--ink)', mut:'var(--mut)', acc:'var(--acc)', danger:'var(--danger)' },
+    fontFamily: { sans: ['Inter','system-ui','sans-serif'] }
+  }}
+};
+</script>
+
+<style>
+:root{
+  --bg:#050505; --card:#111111; --card2:#161616;
+  --line:rgba(255,255,255,.07); --line2:rgba(255,255,255,.14);
+  --ink:#F4F5F7; --mut:#98A0AB; --acc:#4388FF; --danger:#F45B5B;
+  --acc-soft:rgba(67,136,255,.12);
+  --shadow:0 24px 60px rgba(0,0,0,.5);
+}
+[data-theme="light"]{
+  --bg:#F4F5F7; --card:#FFFFFF; --card2:#FAFAFB;
+  --line:rgba(12,16,24,.09); --line2:rgba(12,16,24,.16);
+  --ink:#0B0E13; --mut:#5D6673; --acc:#2B6BE4; --danger:#D93B3B;
+  --acc-soft:rgba(43,107,228,.10);
+  --shadow:0 20px 50px rgba(15,20,30,.10);
+}
+html{ color-scheme:dark; scroll-behavior:smooth; }
+[data-theme="light"]{ color-scheme:light; }
+html,body{ background:var(--bg); }
+body{ color:var(--ink); font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+body.locked{ overflow:hidden; }
+
+.num{ font-variant-numeric:tabular-nums; letter-spacing:-0.02em; }
+.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+:focus-visible{ outline:2px solid var(--acc); outline-offset:2px; border-radius:8px; }
+
+/* ---- primitives ---- */
+.panel{ background:var(--card); border:1px solid var(--line); border-radius:16px; }
+.overline{ font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--mut); font-weight:500; }
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:.5rem; border-radius:10px; font-size:.875rem; font-weight:500; padding:.55rem 1rem; border:1px solid var(--line2); color:var(--ink); background:var(--card); transition:border-color .18s, color .18s, background .18s, transform .18s; cursor:pointer; }
+.btn:hover{ border-color:var(--acc); color:var(--acc); }
+.btn:active{ transform:translateY(1px); }
+.btn:disabled{ opacity:.45; cursor:not-allowed; }
+.btn:disabled:hover{ border-color:var(--line2); color:var(--ink); }
+.btn-primary{ background:var(--acc); border-color:var(--acc); color:#fff; }
+.btn-primary:hover{ color:#fff; filter:brightness(1.12); }
+.btn-danger{ border-color:var(--danger); color:var(--danger); }
+.btn-danger:hover{ border-color:var(--danger); color:var(--danger); filter:brightness(1.1); }
+.icon-btn{ width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:9px; color:var(--mut); transition:.18s; cursor:pointer; }
+.icon-btn:hover{ color:var(--ink); background:var(--card2); }
+.icon-btn.active{ color:var(--acc); background:var(--acc-soft); }
+.icon-btn.danger{ color:var(--danger); background:rgba(244,91,91,.1); }
+.inp{ background:var(--card2); border:1px solid var(--line2); border-radius:10px; color:var(--ink); padding:.55rem .75rem; font-size:.9rem; transition:border-color .18s, box-shadow .18s; width:100%; }
+.inp:focus{ outline:none; border-color:var(--acc); box-shadow:0 0 0 3px var(--acc-soft); }
+.sel{ background:var(--card); border:1px solid var(--line2); border-radius:10px; color:var(--ink); font-size:.85rem; padding:.5rem .75rem; cursor:pointer; }
+.sel:focus{ outline:none; border-color:var(--acc); }
+.seg{ display:inline-flex; background:var(--card); border:1px solid var(--line); border-radius:11px; padding:3px; gap:2px; }
+.seg button{ padding:.35rem .8rem; border-radius:8px; font-size:.8rem; font-weight:500; color:var(--mut); transition:.18s; cursor:pointer; display:inline-flex; align-items:center; gap:.4rem; }
+.seg button:hover{ color:var(--ink); }
+.seg button[aria-pressed="true"]{ background:var(--acc-soft); color:var(--acc); }
+.switch{ width:40px; height:22px; border-radius:99px; background:var(--card2); border:1px solid var(--line2); position:relative; transition:.2s; cursor:pointer; flex-shrink:0; }
+.switch::after{ content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:50%; background:var(--mut); transition:.2s; }
+.switch[aria-checked="true"]{ background:var(--acc); border-color:var(--acc); }
+.switch[aria-checked="true"]::after{ left:19px; background:#fff; }
+.chip{ display:inline-flex; align-items:center; gap:6px; padding:.42rem .8rem; border-radius:999px; border:1px solid var(--line2); background:var(--card); font-size:.78rem; font-weight:500; color:var(--mut); transition:.18s; cursor:pointer; }
+.chip:hover{ color:var(--ink); border-color:var(--mut); }
+.chip-on{ color:var(--acc); border-color:var(--acc); background:var(--acc-soft); }
+.chip-on:hover{ color:var(--acc); border-color:var(--acc); }
+.kbd{ display:inline-block; padding:2px 9px; border:1px solid var(--line2); border-bottom-width:2px; border-radius:6px; background:var(--card2); font-size:11px; font-family:inherit; color:var(--ink); }
+.nav-link{ position:relative; display:flex; align-items:center; gap:.45rem; padding:.45rem .7rem; border-radius:8px; font-size:.85rem; color:var(--mut); transition:color .18s; }
+.nav-link:hover{ color:var(--ink); }
+.nav-link.active{ color:var(--acc); }
+.nav-link.active::after{ content:''; position:absolute; left:.7rem; right:.7rem; bottom:-15px; height:2px; background:var(--acc); border-radius:2px; }
+.site-header{ background:var(--bg); background:color-mix(in srgb, var(--bg) 84%, transparent); backdrop-filter:blur(12px); }
+.tool-card{ transition:border-color .2s, transform .2s, box-shadow .2s; }
+.tool-card:hover{ border-color:color-mix(in srgb, var(--acc) 55%, transparent); transform:translateY(-3px); box-shadow:var(--shadow); }
+.sel-ring{ border-color:var(--acc) !important; box-shadow:0 0 0 1px var(--acc); }
+
+/* ---- motion ---- */
+@keyframes rise{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:none;} }
+.rise{ animation:rise .7s cubic-bezier(.2,.6,.2,1) both; }
+.rise-1{ animation-delay:.06s } .rise-2{ animation-delay:.12s } .rise-3{ animation-delay:.18s }
+.rise-4{ animation-delay:.24s } .rise-5{ animation-delay:.32s } .rise-6{ animation-delay:.4s }
+@keyframes blink{ 50%{ opacity:.22; } }
+.colon{ animation:blink 1s steps(1) infinite; color:var(--mut); }
+@keyframes pulseBtn{ 50%{ transform:scale(1.045); } }
+.alarm-stop{ animation:pulseBtn 1s ease-in-out infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{ animation:none !important; transition:none !important; }
+}
+
+/* ---- flip clock ---- */
+.flip-wrap{ display:inline-flex; align-items:center; }
+.flip{ position:relative; display:inline-flex; align-items:center; justify-content:center; width:1.5ch; height:1.85ch; background:var(--card2); border:1px solid var(--line2); border-radius:.14em; overflow:hidden; font-weight:600; perspective:400px; }
+.flip::after{ content:''; position:absolute; left:0; right:0; top:50%; height:1px; background:rgba(0,0,0,.5); z-index:2; pointer-events:none; }
+[data-theme="light"] .flip::after{ background:rgba(0,0,0,.14); }
+.flip-old{ display:flex; align-items:center; justify-content:center; width:100%; height:100%; }
+.flip-new{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:var(--card2); transform-origin:50% 0%; backface-visibility:hidden; animation:flap .45s cubic-bezier(.25,.6,.3,1) both; }
+@keyframes flap{
+  0%{ transform:rotateX(-92deg); filter:brightness(.35); }
+  55%{ filter:brightness(1.2); }
+  100%{ transform:rotateX(0deg); filter:brightness(1); }
+}
+</style>
+</head>
+<body>
+
+<div id="root">
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#050505;color:#98A0AB;font-family:Inter,sans-serif">
+    <div style="text-align:center">
+      <div style="width:34px;height:34px;margin:0 auto 16px;border:2px solid #1c1c1c;border-top-color:#4388FF;border-radius:50%;animation:spin 1s linear infinite"></div>
+      <div style="font-size:11px;letter-spacing:.22em;text-transform:uppercase">Starting DarkClock Pro</div>
+    </div>
+  </div>
+</div>
+<noscript><div style="padding:40px;text-align:center;color:#98A0AB;font-family:Inter,sans-serif">DarkClock Pro needs JavaScript to run — all timekeeping happens locally in your browser.</div></noscript>
+
+<script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.4/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo, useReducer, useContext } = React;
+
+/* ================================================================
+   CONFIGURATION
+   ================================================================ */
+
+const SITE_CONFIG = {
+  contactEmail: "hello@yourdomain.com",  // replace with your real address
+};
+
+const DEFAULT_SETTINGS = {
+  theme: "dark", timeFormat: "24", sound: true, notify: true,
+  defaultTimerMin: 5, clockStyle: "digital", showSeconds: true, showDate: true,
+  displayTz: "",
+};
+
+const META = {
+  "/": ["DarkClock Pro — Free Online Clock, Timer, Stopwatch & Alarm",
+        "A precise free online clock with countdown timer, stopwatch, online alarm clock and world clock. Fast, minimal, private — no sign-up required."],
+  "/clock": ["Online Clock — Digital, Minimal & Flip Clock | DarkClock Pro",
+        "Free online clock with large digital, minimal and flip-clock styles, 12/24-hour format, fullscreen study mode and any time zone."],
+  "/timer": ["Free Online Timer — Countdown Clock with Alarm | DarkClock Pro",
+        "Free online countdown timer with presets from 1 to 60 minutes, progress ring, sound alarm, desktop notifications and multiple timers."],
+  "/stopwatch": ["Online Stopwatch with Lap Times & Milliseconds | DarkClock Pro",
+        "Precision online stopwatch with millisecond display, lap splits, fastest/slowest lap highlighting and keyboard shortcuts."],
+  "/alarm": ["Online Alarm Clock with Snooze & Repeat | DarkClock Pro",
+        "Set a free online alarm clock in your browser — custom names, weekday repeat, multiple tones, snooze and desktop notifications."],
+  "/world": ["World Clock — Current Time Around the World | DarkClock Pro",
+        "World clock showing accurate current time, date and time difference for cities worldwide, with automatic daylight-saving handling."],
+  "/settings": ["Settings | DarkClock Pro", "Theme, time format, sound, notifications and clock preferences for DarkClock Pro."],
+  "/about": ["About | DarkClock Pro", "What DarkClock Pro is and why it exists."],
+  "/contact": ["Contact | DarkClock Pro", "Get in touch with the DarkClock Pro team."],
+  "/privacy": ["Privacy Policy | DarkClock Pro", "How DarkClock Pro handles your data — everything stays on your device."],
+  "/terms": ["Terms & Conditions | DarkClock Pro", "Terms of use for DarkClock Pro."],
+};
+
+const SHORTCUTS = [
+  ["Space", "Timer · Stopwatch", "Start / pause / resume"],
+  ["L", "Stopwatch", "Record a lap"],
+  ["R", "Timer · Stopwatch", "Reset"],
+  ["N", "Timer", "New timer"],
+  ["F", "Clock", "Fullscreen"],
+  ["T", "Clock", "Toggle 12 / 24-hour"],
+  ["Esc", "Fullscreen", "Exit"],
+];
+
+const CITIES = [
+  ["New York","United States","America/New_York"],["Los Angeles","United States","America/Los_Angeles"],
+  ["Chicago","United States","America/Chicago"],["Denver","United States","America/Denver"],
+  ["Phoenix","United States","America/Phoenix"],["Honolulu","United States","Pacific/Honolulu"],
+  ["Anchorage","United States","America/Anchorage"],["Toronto","Canada","America/Toronto"],
+  ["Vancouver","Canada","America/Vancouver"],["Mexico City","Mexico","America/Mexico_City"],
+  ["Havana","Cuba","America/Havana"],["Bogotá","Colombia","America/Bogota"],
+  ["Lima","Peru","America/Lima"],["Caracas","Venezuela","America/Caracas"],
+  ["Santiago","Chile","America/Santiago"],["São Paulo","Brazil","America/Sao_Paulo"],
+  ["Buenos Aires","Argentina","America/Argentina/Buenos_Aires"],
+  ["London","United Kingdom","Europe/London"],["Dublin","Ireland","Europe/Dublin"],
+  ["Lisbon","Portugal","Europe/Lisbon"],["Reykjavik","Iceland","Atlantic/Reykjavik"],
+  ["Paris","France","Europe/Paris"],["Berlin","Germany","Europe/Berlin"],
+  ["Madrid","Spain","Europe/Madrid"],["Rome","Italy","Europe/Rome"],
+  ["Amsterdam","Netherlands","Europe/Amsterdam"],["Zurich","Switzerland","Europe/Zurich"],
+  ["Vienna","Austria","Europe/Vienna"],["Prague","Czechia","Europe/Prague"],
+  ["Warsaw","Poland","Europe/Warsaw"],["Stockholm","Sweden","Europe/Stockholm"],
+  ["Helsinki","Finland","Europe/Helsinki"],["Athens","Greece","Europe/Athens"],
+  ["Istanbul","Türkiye","Europe/Istanbul"],["Moscow","Russia","Europe/Moscow"],
+  ["Cairo","Egypt","Africa/Cairo"],["Nairobi","Kenya","Africa/Nairobi"],
+  ["Lagos","Nigeria","Africa/Lagos"],["Johannesburg","South Africa","Africa/Johannesburg"],
+  ["Dubai","United Arab Emirates","Asia/Dubai"],["Riyadh","Saudi Arabia","Asia/Riyadh"],
+  ["Doha","Qatar","Asia/Qatar"],["Tehran","Iran","Asia/Tehran"],
+  ["Karachi","Pakistan","Asia/Karachi"],["Mumbai","India","Asia/Kolkata"],
+  ["Delhi","India","Asia/Kolkata"],["Kathmandu","Nepal","Asia/Kathmandu"],
+  ["Dhaka","Bangladesh","Asia/Dhaka"],["Bangkok","Thailand","Asia/Bangkok"],
+  ["Jakarta","Indonesia","Asia/Jakarta"],["Singapore","Singapore","Asia/Singapore"],
+  ["Kuala Lumpur","Malaysia","Asia/Kuala_Lumpur"],["Hong Kong","Hong Kong","Asia/Hong_Kong"],
+  ["Shanghai","China","Asia/Shanghai"],["Beijing","China","Asia/Shanghai"],
+  ["Taipei","Taiwan","Asia/Taipei"],["Manila","Philippines","Asia/Manila"],
+  ["Seoul","South Korea","Asia/Seoul"],["Tokyo","Japan","Asia/Tokyo"],
+  ["Perth","Australia","Australia/Perth"],["Sydney","Australia","Australia/Sydney"],
+  ["Melbourne","Australia","Australia/Melbourne"],["Auckland","New Zealand","Pacific/Auckland"],
+];
+
+/* ================================================================
+   UTILITIES
+   ================================================================ */
+
+const pad = (n, l = 2) => String(n).padStart(l, "0");
+
+const fcache = new Map();
+function fget(key, opts) {
+  if (!fcache.has(key)) fcache.set(key, new Intl.DateTimeFormat("en-US", opts));
+  return fcache.get(key);
+}
+function getTimeParts(tz, date, hour12) {
+  const key = "t|" + (tz || "") + "|" + hour12;
+  const opts = { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12 };
+  if (!hour12) opts.hourCycle = "h23";
+  if (tz) opts.timeZone = tz;
+  const p = {};
+  for (const x of fget(key, opts).formatToParts(date)) p[x.type] = x.value;
+  return { h: p.hour, m: p.minute, s: p.second, ap: (p.dayPeriod || "").toUpperCase() };
+}
+function getDateParts(tz, date) {
+  const opts = { weekday: "long", month: "long", day: "numeric", year: "numeric" };
+  if (tz) opts.timeZone = tz;
+  const p = {};
+  for (const x of fget("d|" + (tz || ""), opts).formatToParts(date)) p[x.type] = x.value;
+  return p;
+}
+function getShortDate(tz, date) {
+  const opts = { weekday: "short", month: "short", day: "numeric" };
+  if (tz) opts.timeZone = tz;
+  return fget("sd|" + (tz || ""), opts).format(date);
+}
+// Offset of a timezone in minutes east of UTC (DST handled by Intl automatically)
+function tzOffsetMin(tz, date = new Date()) {
+  try {
+    const opts = { hour12: false, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" };
+    if (tz) opts.timeZone = tz;
+    const p = {};
+    for (const x of fget("off|" + (tz || ""), opts).formatToParts(date)) p[x.type] = x.value;
+    const asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute, +p.second);
+    return Math.round((asUTC - date.getTime()) / 60000);
+  } catch (e) { return -date.getTimezoneOffset(); }
+}
+function fmtOffset(mins) {
+  const s = mins < 0 ? "−" : "+", a = Math.abs(mins);
+  return "UTC" + s + pad(Math.floor(a / 60)) + ":" + pad(a % 60);
+}
+function fmtDiff(mins) {
+  if (mins === 0) return "Same as you";
+  const a = Math.abs(mins), h = Math.floor(a / 60), m = a % 60;
+  return (mins > 0 ? "+" : "−") + (h ? h + (m ? ":" + pad(m) : "") + " h" : m + " m")
+       + " " + (mins > 0 ? "ahead" : "behind");
+}
+function dayShift(tz, now) {
+  const a = fget("ds|" + (tz || ""), { timeZone: tz || undefined, year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+  const b = fget("ds|local", { year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
+  return a === b ? null : (a > b ? "+1 day" : "−1 day");
+}
+function fmtDur(ms) {
+  ms = Math.max(0, ms);
+  const h = Math.floor(ms / 3600000), m = Math.floor(ms / 60000) % 60, s = Math.floor(ms / 1000) % 60;
+  return h > 0 ? h + ":" + pad(m) + ":" + pad(s) : pad(m) + ":" + pad(s);
+}
+function fmtSW(ms) {
+  ms = Math.max(0, ms);
+  const cs = Math.floor(ms / 10) % 100, s = Math.floor(ms / 1000) % 60,
+        m = Math.floor(ms / 60000) % 60, h = Math.floor(ms / 3600000);
+  return (h ? pad(h) + ":" : "") + pad(m) + ":" + pad(s) + "." + pad(cs);
+}
+function fmtSpan(ms) {
+  ms = Math.max(0, ms);
+  const s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+  if (d) return d + "d " + h + "h";
+  if (h) return h + "h " + pad(m) + "m";
+  if (m) return m + "m " + pad(s % 60) + "s";
+  return s + "s";
+}
+function fmtStoredTime(time, hour12) {
+  const [h, m] = time.split(":").map(Number);
+  if (!hour12) return pad(h) + ":" + pad(m);
+  return (h % 12 || 12) + ":" + pad(m) + " " + (h >= 12 ? "PM" : "AM");
+}
+function dayProgress(now) {
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  return (now.getTime() - start) / 86400000 * 100;
+}
+function repeatLabel(days) {
+  if (!days || !days.length) return "One-time";
+  if (days.length === 7) return "Every day";
+  if (days.length === 5 && [1,2,3,4,5].every(d => days.includes(d))) return "Weekdays";
+  if (days.length === 2 && days.includes(0) && days.includes(6)) return "Weekends";
+  return [...days].sort().map(d => ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d]).join(", ");
+}
+function nextAlarmOccurrence(a, now) {
+  const [hh, mm] = a.time.split(":").map(Number);
+  for (let d = 0; d < 8; d++) {
+    const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d, hh, mm, 0, 0);
+    if (dt.getTime() <= now.getTime()) continue;
+    if (a.days && a.days.length && !a.days.includes(dt.getDay())) continue;
+    if (d > 0 && (!a.days || !a.days.length)) break; // one-time alarms only fire today
+    return dt;
+  }
+  return null;
+}
+
+// ---- persistence (localStorage, debounced option for fast-changing state) ----
+function usePersisted(key, initial, defer) {
+  const [v, setV] = useState(() => {
+    try { const s = localStorage.getItem("dcp." + key); return s ? JSON.parse(s) : initial; }
+    catch (e) { return initial; }
+  });
+  const str = JSON.stringify(v);
+  useEffect(() => {
+    const write = () => { try { localStorage.setItem("dcp." + key, str); } catch (e) {} };
+    if (defer) { const t = setTimeout(write, 600); return () => clearTimeout(t); }
+    write();
+  }, [str]);
+  return [v, setV];
+}
+
+// ---- clock tick hook (timestamp-based; snaps on tab return) ----
+function useNow(interval = 1000) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), interval);
+    const onVis = () => setNow(new Date());
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(id); document.removeEventListener("visibilitychange", onVis); };
+  }, [interval]);
+  return now;
+}
+
+function useRoute() {
+  const [route, setRoute] = useState(() => location.hash.replace(/^#/, "") || "/");
+  useEffect(() => {
+    const on = () => setRoute(location.hash.replace(/^#/, "") || "/");
+    window.addEventListener("hashchange", on);
+    return () => window.removeEventListener("hashchange", on);
+  }, []);
+  return route;
+}
+
+function useShortcuts(map) {
+  useEffect(() => {
+    const onKey = (e) => {
+      const t = e.target;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const fn = map[e.code];
+      if (fn) { e.preventDefault(); fn(); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [map]);
+}
+
+/* ================================================================
+   AUDIO (WebAudio-generated tones — no files, no network)
+   ================================================================ */
+const AudioEngine = {
+  ctx: null,
+  ensure() {
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) { try { this.ctx = new AC(); } catch (e) {} }
+    }
+    if (this.ctx && this.ctx.state === "suspended") this.ctx.resume();
+    return this.ctx;
+  },
+  beep(freq = 880, dur = 0.14, when = 0, type = "sine", gain = 0.16) {
+    const ctx = this.ensure(); if (!ctx) return;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    const t0 = ctx.currentTime + when;
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(gain, t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g).connect(ctx.destination);
+    o.start(t0); o.stop(t0 + dur + 0.05);
+  },
+  tone(name) {
+    const P = {
+      chime:   [[659.3, 0], [830.6, 0.18], [987.8, 0.36], [1318.5, 0.54]],
+      beep:    [[880, 0], [880, 0.22], [880, 0.44]],
+      bell:    [[1318.5, 0], [987.8, 0.16], [659.3, 0.34]],
+      digital: [[1244.5, 0], [1244.5, 0.1], [1661.2, 0.2], [1661.2, 0.3]],
+    };
+    (P[name] || P.beep).forEach(([f, t]) => this.beep(f, 0.16, t, name === "beep" ? "square" : "sine", 0.16));
+  },
+};
+
+// ---- notifications ----
+async function requestNotify() {
+  if (!("Notification" in window)) return "unsupported";
+  if (Notification.permission === "granted") return "granted";
+  if (Notification.permission === "denied") return "denied";
+  try { return await Notification.requestPermission(); } catch (e) { return "denied"; }
+}
+function sendNotify(title, body) {
+  if ("Notification" in window && Notification.permission === "granted") {
+    try { new Notification(title, { body, tag: "darkclock-pro" }); } catch (e) {}
+  }
+}
+
+/* ================================================================
+   ICONS (consistent inline stroke set)
+   ================================================================ */
+const ICONS = {
+  clock: <React.Fragment><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></React.Fragment>,
+  timer: <React.Fragment><path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/></React.Fragment>,
+  stopwatch: <React.Fragment><path d="M10 2h4"/><path d="M12 6v2"/><circle cx="12" cy="14" r="8"/><path d="M12 14l2.5-2.5"/></React.Fragment>,
+  alarm: <React.Fragment><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></React.Fragment>,
+  globe: <React.Fragment><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 4 9 15 15 0 0 1-4 9 15 15 0 0 1-4-9 15 15 0 0 1 4-9z"/></React.Fragment>,
+  settings: <React.Fragment><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></React.Fragment>,
+  plus: <React.Fragment><path d="M12 5v14"/><path d="M5 12h14"/></React.Fragment>,
+  trash: <React.Fragment><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></React.Fragment>,
+  pencil: <React.Fragment><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></React.Fragment>,
+  play: <React.Fragment><polygon points="6 3 20 12 6 21 6 3"/></React.Fragment>,
+  pause: <React.Fragment><line x1="9" y1="5" x2="9" y2="19"/><line x1="15" y1="5" x2="15" y2="19"/></React.Fragment>,
+  reset: <React.Fragment><path d="M1 4v6h6"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></React.Fragment>,
+  maximize: <React.Fragment><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></React.Fragment>,
+  minimize: <React.Fragment><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></React.Fragment>,
+  x: <React.Fragment><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></React.Fragment>,
+  check: <React.Fragment><polyline points="20 6 9 17 4 12"/></React.Fragment>,
+  search: <React.Fragment><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></React.Fragment>,
+  belloff: <React.Fragment><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/><line x1="3" y1="3" x2="21" y2="21"/></React.Fragment>,
+  sun: <React.Fragment><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.9" y1="4.9" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.1" y2="19.1"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.9" y1="19.1" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.1" y2="4.9"/></React.Fragment>,
+  moon: <React.Fragment><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></React.Fragment>,
+  volume: <React.Fragment><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></React.Fragment>,
+  keyboard: <React.Fragment><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01"/><path d="M10 10h.01"/><path d="M14 10h.01"/><path d="M18 10h.01"/><path d="M6 14h.01"/><path d="M18 14h.01"/><path d="M9 14h6"/></React.Fragment>,
+  arrow: <React.Fragment><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></React.Fragment>,
+  menu: <React.Fragment><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></React.Fragment>,
+  info: <React.Fragment><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><path d="M12 8h.01"/></React.Fragment>,
+  mail: <React.Fragment><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22 6 12 13 2 6"/></React.Fragment>,
+  zap: <React.Fragment><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></React.Fragment>,
+  flag: <React.Fragment><path d="M4 22V4c4-2 8 2 12 0v10c-4 2-8-2-12 0"/></React.Fragment>,
+  shield: <React.Fragment><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/></React.Fragment>,
+  file: <React.Fragment><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></React.Fragment>,
+};
+function Icon({ name, size = 18, className = "" }) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor"
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      {ICONS[name]}
+    </svg>
+  );
+}
+
+/* ================================================================
+   SHARED UI PRIMITIVES
+   ================================================================ */
+const Ctx = React.createContext(null);
+const useCtx = () => useContext(Ctx);
+
+function Seg({ options, value, onChange, ariaLabel }) {
+  return (
+    <div className="seg" role="group" aria-label={ariaLabel}>
+      {options.map(o => (
+        <button key={o.value} type="button" aria-pressed={value === o.value} onClick={() => onChange(o.value)}>
+          {o.icon && <Icon name={o.icon} size={14} />}{o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+function Switch({ checked, onChange, label }) {
+  return <button type="button" role="switch" aria-checked={checked} aria-label={label} className="switch" onClick={() => onChange(!checked)} />;
+}
+function ToggleChip({ on, onClick, children }) {
+  return <button type="button" className={"chip" + (on ? " chip-on" : "")} aria-pressed={on} onClick={onClick}>
+    {on && <Icon name="check" size={13} />}{children}
+  </button>;
+}
+function Row({ label, hint, children }) {
+  return (
+    <div className="flex items-center justify-between gap-6 py-4 border-b border-line last:border-0">
+      <div className="min-w-0">
+        <div className="text-sm font-medium">{label}</div>
+        {hint && <div className="text-xs text-mut mt-0.5">{hint}</div>}
+      </div>
+      <div className="shrink-0">{children}</div>
+    </div>
+  );
+}
+function TzSelect({ value, onChange, ariaLabel }) {
+  const zones = useMemo(() => {
+    const seen = new Set(); const out = [["", "Device time (auto)"], ["UTC", "UTC"]];
+    for (const c of CITIES) if (!seen.has(c[2])) { seen.add(c[2]); out.push([c[2], c[0]]); }
+    return out;
+  }, []);
+  return (
+    <select className="sel" value={value} onChange={e => onChange(e.target.value)} aria-label={ariaLabel || "Time zone"}>
+      {zones.map(([v, l]) => <option key={v || "local"} value={v}>{l}</option>)}
+    </select>
+  );
+}
+function MiniShortcuts({ items }) {
+  return (
+    <div className="panel p-4">
+      <div className="text-[10px] uppercase tracking-[.16em] text-mut mb-3 font-medium">Shortcuts</div>
+      <ul className="space-y-2.5 text-sm">
+        {items.map(([k, d]) => (
+          <li key={k + d} className="flex justify-between items-center gap-3">
+            <span className="text-mut text-xs">{d}</span><kbd className="kbd">{k}</kbd>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+function PageHead({ icon, title, desc }) {
+  return (
+    <div className="pt-10 sm:pt-14 pb-8">
+      <div className="flex items-center gap-2.5 text-acc">
+        <Icon name={icon} size={18} />
+        <span className="overline" style={{ color: "var(--acc)" }}>{title}</span>
+      </div>
+      <h1 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight">{desc[0]}</h1>
+      <p className="mt-2 text-sm text-mut max-w-xl leading-relaxed">{desc[1]}</p>
+    </div>
+  );
+}
+
+/* ================================================================
+   CLOCK VISUALS
+   ================================================================ */
+function SecondRuler({ sec }) {
+  return (
+    <div className="flex items-end justify-between max-w-3xl mx-auto px-1" role="img" aria-label={"Seconds: " + sec}>
+      {Array.from({ length: 60 }, (_, i) => {
+        const active = i === sec, prev = i === ((sec + 59) % 60), major = i % 5 === 0;
+        return (
+          <span key={i} className="rounded-full" style={{
+            width: 2, height: active ? 22 : major ? 13 : 8,
+            background: active ? "var(--acc)" : prev ? "rgba(67,136,255,.4)" : major ? "var(--line2)" : "var(--line)",
+            boxShadow: active ? "0 0 10px rgba(67,136,255,.55)" : "none",
+            transition: "height .15s ease, background .15s ease",
+          }} />
+        );
+      })}
+    </div>
+  );
+}
+
+function ProgressRing({ progress = 0, size = 190, stroke = 5, children }) {
+  const r = (size - stroke) / 2, C = 2 * Math.PI * r;
+  const p = Math.max(0, Math.min(1, progress));
+  return (
+    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
+      <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }} aria-hidden="true">
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--line)" strokeWidth={stroke} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--acc)" strokeWidth={stroke} strokeLinecap="round"
+          strokeDasharray={C} strokeDashoffset={C * (1 - p)}
+          style={{ transition: "stroke-dashoffset .25s linear", filter: "drop-shadow(0 0 6px rgba(67,136,255,.35))" }} />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">{children}</div>
+    </div>
+  );
+}
+
+/* ---- flip clock ---- */
+function FlipDigit({ ch }) {
+  const [shown, setShown] = useState(ch);
+  const [flipping, setFlipping] = useState(false);
+  useEffect(() => {
+    if (ch !== shown) {
+      setFlipping(true);
+      const t = setTimeout(() => { setShown(ch); setFlipping(false); }, 450);
+      return () => clearTimeout(t);
+    }
+  }, [ch, shown]);
+  return (
+    <span className="flip" aria-hidden="true">
+      <span className="flip-old num">{shown}</span>
+      {flipping && <span key={ch} className="flip-new num">{ch}</span>}
+      <span className="sr-only">{ch}</span>
+    </span>
+  );
+}
+const FlipColon = () => <span className="text-mut" style={{ fontSize: ".6em", alignSelf: "center", padding: "0 .14em" }}>:</span>;
+function FlipClockView({ h, m, s, showSeconds, size }) {
+  const groups = [h, m];
+  if (showSeconds) groups.push(s);
+  return (
+    <div className="flip-wrap" style={{ fontSize: size || "clamp(2.4rem,9vw,6rem)" }} role="timer" aria-label={h + ":" + m + (showSeconds ? ":" + s : "")}>
+      {groups.map((g, gi) => (
+        <React.Fragment key={gi}>
+          {gi > 0 && <FlipColon />}
+          {g.split("").map((c, i) => <FlipDigit key={i} ch={c} />)}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+/* ---- the big clock view (digital / minimal / flip) ---- */
+function BigClock({ style, tz, hour12, showSeconds, showDate, now, hero }) {
+  const p = getTimeParts(tz, now, hour12);
+  const d = getDateParts(tz, now);
+  const sec = +p.s;
+  const sizeCls = hero
+    ? "text-[clamp(3.4rem,13vw,10rem)]"
+    : "text-[clamp(3.6rem,14vw,9.5rem)]";
+
+  let clock;
+  if (style === "flip") {
+    clock = <FlipClockView h={p.h} m={p.m} s={p.s} showSeconds={showSeconds} />;
+  } else if (style === "minimal") {
+    clock = (
+      <div className="inline-block">
+        <div className="num font-extralight leading-none tracking-tight flex items-baseline gap-3"
+          role="timer" aria-label={p.h + ":" + p.m + (showSeconds ? ":" + p.s : "")}>
+          <span className={sizeCls}>{p.h}<span className="text-mut" style={{animation:"none"}}>:</span>{p.m}</span>
+          {showSeconds && <span className="num text-acc text-[clamp(1.1rem,3vw,2rem)] font-medium">{p.s}</span>}
+          {p.ap && <span className="text-mut text-lg font-medium">{p.ap}</span>}
+        </div>
+        <div className="mt-4 h-[2px] bg-line rounded-full overflow-hidden">
+          <div className="h-full bg-acc rounded-full" style={{ width: ((sec + now.getMilliseconds() / 1000) / 60 * 100) + "%", transition: "width .25s linear" }} />
+        </div>
+      </div>
+    );
+  } else {
+    clock = (
+      <div className={"num font-semibold leading-none tracking-tight flex items-baseline justify-center " + sizeCls}
+        role="timer" aria-label={p.h + ":" + p.m + (showSeconds ? ":" + p.s : "") + " " + p.ap}>
+        <span>{p.h}</span><span className="colon">:</span><span>{p.m}</span>
+        {showSeconds && <React.Fragment><span className="colon">:</span><span className="text-acc" style={{ fontSize: ".45em", fontWeight: 500 }}>{p.s}</span></React.Fragment>}
+        {p.ap && <span className="text-mut font-medium" style={{ fontSize: ".22em", marginLeft: ".6em", letterSpacing: ".08em" }}>{p.ap}</span>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="text-center">
+      {clock}
+      {showDate && (
+        <p className="mt-5 text-sm sm:text-base text-mut">
+          {d.weekday}, {d.month} {d.day}, {d.year}
+          {tz && <span className="ml-2 text-xs opacity-70">· {tz}</span>}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function FullscreenClock({ onClose }) {
+  const { settings } = useCtx();
+  const now = useNow(200);
+  useEffect(() => {
+    document.body.classList.add("locked");
+    try { const r = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); if (r && r.catch) r.catch(() => {}); } catch (e) {}
+    const onFs = () => { if (!document.fullscreenElement) onClose(); };
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("fullscreenchange", onFs);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.classList.remove("locked");
+      document.removeEventListener("fullscreenchange", onFs);
+      window.removeEventListener("keydown", onKey);
+      try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) {}
+    };
+  }, []);
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center" style={{ background: "var(--bg)" }}>
+      <BigClock style={settings.clockStyle === "flip" ? "flip" : settings.clockStyle}
+        tz={settings.displayTz} hour12={settings.timeFormat === "12"}
+        showSeconds={settings.showSeconds} showDate={settings.showDate} now={now} />
+      <button className="btn mt-10" onClick={onClose}><Icon name="minimize" size={15} /> Exit fullscreen <kbd className="kbd ml-1">Esc</kbd></button>
+    </div>
+  );
+}
+
+/* ================================================================
+   NAVIGATION & FOOTER
+   ================================================================ */
+function LogoMark({ size = 26 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect x="2.5" y="2.5" width="19" height="19" rx="6" stroke="var(--acc)" strokeWidth="1.8" />
+      <path d="M12 7.5V12l3.2 2.1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+const NAV_LINKS = [
+  ["/clock", "Clock", "clock"], ["/timer", "Timer", "timer"],
+  ["/stopwatch", "Stopwatch", "stopwatch"], ["/alarm", "Alarm", "alarm"],
+  ["/world", "World Clock", "globe"], ["/settings", "Settings", "settings"],
+];
+function Nav({ route }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => { setOpen(false); }, [route]);
+  return (
+    <header className="site-header sticky top-0 z-40 border-b border-line">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <a href="#/" className="flex items-center gap-2.5" aria-label="DarkClock Pro home">
+          <LogoMark />
+          <span className="font-semibold tracking-tight text-[15px]">DarkClock</span>
+          <span className="text-[9px] font-semibold tracking-[.18em] text-acc border border-acc rounded px-1.5 py-[2px]" style={{ marginTop: -6 }}>PRO</span>
+        </a>
+        <nav className="hidden md:flex items-center gap-0.5" aria-label="Main">
+          {NAV_LINKS.map(([path, label, icon]) => (
+            <a key={path} href={"#" + path} className={"nav-link" + (route.startsWith(path) ? " active" : "")}>
+              <Icon name={icon} size={15} />{label}
+            </a>
+          ))}
+        </nav>
+        <div className="flex items-center gap-1 md:hidden">
+          <button className="icon-btn" onClick={() => setOpen(o => !o)} aria-expanded={open} aria-label="Menu">
+            <Icon name={open ? "x" : "menu"} />
+          </button>
+        </div>
+      </div>
+      {open && (
+        <nav className="md:hidden border-t border-line px-4 py-3 flex flex-col gap-1" aria-label="Mobile">
+          {NAV_LINKS.map(([path, label, icon]) => (
+            <a key={path} href={"#" + path} className={"nav-link" + (route.startsWith(path) ? " active" : "")}>
+              <Icon name={icon} size={16} />{label}
+            </a>
+          ))}
+        </nav>
+      )}
+    </header>
+  );
+}
+function Footer() {
+  const links = [["/about", "About"], ["/contact", "Contact"], ["/privacy", "Privacy Policy"], ["/terms", "Terms"]];
+  return (
+    <footer className="border-t border-line mt-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
+        <div className="flex items-center gap-2 text-sm">
+          <LogoMark size={20} /><span className="font-medium">DarkClock Pro</span>
+        </div>
+        <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm" aria-label="Footer">
+          {links.map(([p, l]) => <a key={p} href={"#" + p} className="text-mut hover:text-acc transition-colors">{l}</a>)}
+        </nav>
+        <p className="text-xs text-mut">© {new Date().getFullYear()} DarkClock Pro · All times are computed locally in your browser.</p>
+      </div>
+    </footer>
+  );
+}
+function Toasts({ items }) {
+  return (
+    <div className="fixed bottom-5 right-5 z-[70] flex flex-col gap-2 max-w-[calc(100vw-40px)]" aria-live="polite">
+      {items.map(t => (
+        <div key={t.id} className="panel px-4 py-3 flex items-center gap-2.5 text-sm" style={{ boxShadow: "var(--shadow)", animation: "rise .3s ease both" }}>
+          <span className="text-acc"><Icon name={t.icon || "check"} size={16} /></span>{t.msg}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ================================================================
+   HOME
+   ================================================================ */
+function MiniRing({ label }) {
+  const size = 56, stroke = 4, r = (size - stroke) / 2, C = 2 * Math.PI * r;
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} style={{ transform: "rotate(-90deg)" }} aria-hidden="true">
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--line)" strokeWidth={stroke} />
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="var(--acc)" strokeWidth={stroke} strokeLinecap="round"
+          strokeDasharray={C} strokeDashoffset={C * 0.18} />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center num text-[11px] font-semibold">{label}</span>
+    </div>
+  );
+}
+function ToolCard({ to, icon, title, desc, visual }) {
+  return (
+    <a href={to} className="tool-card panel p-6 flex flex-col gap-5">
+      <div className="flex items-center gap-2.5">
+        <span className="text-acc"><Icon name={icon} size={18} /></span>
+        <h3 className="font-semibold tracking-tight">{title}</h3>
+        <span className="ml-auto text-mut"><Icon name="arrow" size={15} /></span>
+      </div>
+      <div className="min-h-[64px] flex items-center">{visual}</div>
+      <p className="text-xs text-mut leading-relaxed">{desc}</p>
+    </a>
+  );
+}
+function Home({ openFS }) {
+  const { settings, update, alarms, push } = useCtx();
+  const now = useNow(250);
+  const tz = settings.displayTz;
+  const p = getTimeParts(tz, now, settings.timeFormat === "12");
+  const d = getDateParts(tz, now);
+  const pct = dayProgress(now);
+  const localOff = -now.getTimezoneOffset();
+  const localZone = (Intl.DateTimeFormat().resolvedOptions().timeZone || "Local time");
+  const defMs = (settings.defaultTimerMin || 5) * 60000;
+
+  // live mini-previews for the tool cards
+  let swLabel = "00:00.00";
+  try {
+    const sw = JSON.parse(localStorage.getItem("dcp.stopwatch") || "null");
+    if (sw) swLabel = fmtSW(sw.acc + (sw.running && sw.startAt ? now.getTime() - sw.startAt : 0));
+  } catch (e) {}
+  let next = null;
+  for (const a of alarms) {
+    if (!a.enabled) continue;
+    if (a.snoozeAt && a.snoozeAt > now.getTime()) { if (!next || a.snoozeAt < next.getTime()) next = new Date(a.snoozeAt); continue; }
+    const occ = nextAlarmOccurrence(a, now);
+    if (occ && (!next || occ < next)) next = occ;
+  }
+
+  return (
+    <div>
+      {/* ---------- hero ---------- */}
+      <section className="pt-14 sm:pt-20 pb-8 text-center">
+        <p className="overline rise">Precision time tools — free, private, no sign-up</p>
+        <div className="rise rise-1 mt-7 flex items-baseline justify-center">
+          <BigClock style="digital" tz={tz} hour12={settings.timeFormat === "12"}
+            showSeconds={settings.showSeconds} showDate={false} now={now} hero />
+        </div>
+        <p className="rise rise-2 mt-5 text-sm sm:text-base text-mut">
+          {d.weekday}, {d.month} {d.day}, {d.year}
+          <span className="mx-2 opacity-40">·</span>{tz ? tz : localZone}
+        </p>
+        <div className="rise rise-3 mt-9"><SecondRuler sec={+p.s} /></div>
+        <div className="rise rise-4 mt-9 flex flex-wrap items-center justify-center gap-3">
+          <Seg ariaLabel="Time format" value={settings.timeFormat}
+            onChange={v => update({ timeFormat: v })}
+            options={[{ value: "12", label: "12-hour" }, { value: "24", label: "24-hour" }]} />
+          <TzSelect value={tz} onChange={v => update({ displayTz: v })} ariaLabel="Display time zone" />
+          <button className="btn" onClick={openFS}><Icon name="maximize" size={15} /> Fullscreen</button>
+          <a className="btn" href="#/clock">Clock styles <Icon name="arrow" size={14} /></a>
+        </div>
+        <div className="rise rise-5 mt-14 max-w-2xl mx-auto px-2">
+          <div className="flex justify-between text-[10px] uppercase tracking-[.16em] text-mut mb-2 font-medium">
+            <span>Day progress</span><span className="num">{pct.toFixed(1)}%</span>
+          </div>
+          <div className="h-[3px] bg-card rounded-full overflow-hidden">
+            <div className="h-full bg-acc rounded-full" style={{ width: pct + "%", transition: "width .5s linear" }} />
+          </div>
+          <div className="mt-3 text-center text-xs text-mut num">
+            Device offset {fmtOffset(localOff)} · {localZone}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- tools ---------- */}
+      <section className="mt-14">
+        <div className="flex items-baseline justify-between mb-5">
+          <h2 className="text-lg font-semibold tracking-tight">Tools</h2>
+          <span className="text-xs text-mut">Everything runs on your device</span>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ToolCard to="#/timer" icon="timer" title="Countdown Timer"
+            desc="Presets from 1 to 60 minutes, animated progress ring, sound alarm and desktop notifications. Run several timers at once."
+            visual={
+              <div className="flex items-center gap-4">
+                <MiniRing label={fmtDur(defMs)} />
+                <div>
+                  <div className="num text-2xl font-semibold">{fmtDur(defMs)}</div>
+                  <div className="text-xs text-mut mt-0.5">Ready to start</div>
+                </div>
+              </div>
+            } />
+          <ToolCard to="#/stopwatch" icon="stopwatch" title="Stopwatch"
+            desc="Millisecond precision, unlimited lap splits, fastest and slowest laps highlighted automatically."
+            visual={
+              <div>
+                <div className="num text-2xl font-semibold">{swLabel}</div>
+                <div className="text-xs text-mut mt-0.5">Lap-ready precision</div>
+              </div>
+            } />
+          <ToolCard to="#/alarm" icon="alarm" title="Alarm Clock"
+            desc="Repeat by weekday, choose from four tones, snooze with one tap — right in your browser."
+            visual={ next ? (
+              <div>
+                <div className="num text-2xl font-semibold">{fmtStoredTime(pad(next.getHours()) + ":" + pad(next.getMinutes()), settings.timeFormat === "12")}</div>
+                <div className="text-xs text-mut mt-0.5">Next alarm · in {fmtSpan(next.getTime() - now.getTime())}</div>
+              </div>
+            ) : (
+              <div>
+                <div className="num text-2xl font-semibold text-mut">--:--</div>
+                <div className="text-xs text-mut mt-0.5">No alarm set yet</div>
+              </div>
+            ) } />
+        </div>
+        <p className="mt-7 text-center text-xs text-mut leading-relaxed">
+          Explore: <a href="#/clock" className="hover:text-acc transition-colors">Online Clock</a> ·
+          <a href="#/timer" className="hover:text-acc transition-colors"> Free Online Timer</a> ·
+          <a href="#/stopwatch" className="hover:text-acc transition-colors"> Stopwatch Online</a> ·
+          <a href="#/alarm" className="hover:text-acc transition-colors"> Online Alarm Clock</a> ·
+          <a href="#/world" className="hover:text-acc transition-colors"> World Clock</a>
+        </p>
+      </section>
+
+      <section className="mt-14 max-w-2xl mx-auto text-center text-sm text-mut leading-relaxed">
+        <p>
+          DarkClock Pro is a free online clock and time toolkit: a large digital clock for studying and desk
+          setups, a countdown timer with alarms and notifications, a millisecond stopwatch with lap splits, an
+          online alarm clock with weekday repeat, and a world clock covering every time zone. No account, no
+          install — everything is computed privately in your browser.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+/* ================================================================
+   CLOCK PAGE
+   ================================================================ */
+function ClockPage({ openFS }) {
+  const { settings, update } = useCtx();
+  const now = useNow(250);
+  const shortcuts = useMemo(() => ({
+    KeyF: () => openFS(),
+    KeyT: () => update({ timeFormat: settings.timeFormat === "12" ? "24" : "12" }),
+  }), [settings.timeFormat]);
+  useShortcuts(shortcuts);
+
+  return (
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8">
+      <div>
+        <PageHead icon="clock" title="ONLINE CLOCK"
+          desc={["The online clock, at any size you need",
+            "Digital, minimal or split-flap — with 12/24-hour format, any time zone, and a fullscreen mode made for studying and desk setups."]} />
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Seg ariaLabel="Clock style" value={settings.clockStyle} onChange={v => update({ clockStyle: v })}
+            options={[{ value: "digital", label: "Digital" }, { value: "minimal", label: "Minimal" }, { value: "flip", label: "Flip" }]} />
+          <Seg ariaLabel="Time format" value={settings.timeFormat} onChange={v => update({ timeFormat: v })}
+            options={[{ value: "12", label: "12h" }, { value: "24", label: "24h" }]} />
+          <TzSelect value={settings.displayTz} onChange={v => update({ displayTz: v })} />
+          <ToggleChip on={settings.showSeconds} onClick={() => update({ showSeconds: !settings.showSeconds })}>Seconds</ToggleChip>
+          <ToggleChip on={settings.showDate} onClick={() => update({ showDate: !settings.showDate })}>Date</ToggleChip>
+          <button className="btn ml-auto" onClick={openFS}><Icon name="maximize" size={15} /> Fullscreen</button>
+        </div>
+
+        <div className="panel mt-6 py-16 sm:py-24 px-4 relative overflow-hidden">
+          <BigClock style={settings.clockStyle} tz={settings.displayTz}
+            hour12={settings.timeFormat === "12"} showSeconds={settings.showSeconds}
+            showDate={settings.showDate} now={now} />
+        </div>
+
+        <div className="mt-8 max-w-2xl">
+          <h2 className="text-base font-semibold tracking-tight">A precise online clock for every setup</h2>
+          <p className="mt-2 text-sm text-mut leading-relaxed">
+            The Digital style gives you large tabular numerals with a softly blinking colon; Minimal strips the
+            display down to hours and minutes with a thin sweeping line for seconds; Flip reproduces the classic
+            split-flap desk clock with a smooth flap animation on every change. Switch to fullscreen for a
+            distraction-free study timer, pick any time zone for remote work, and toggle seconds or the date to
+            match your desk. Your preferences are saved on this device automatically.
+          </p>
+        </div>
+      </div>
+      <aside className="hidden lg:block">
+        <div className="sticky top-24">
+          <MiniShortcuts items={[["F", "Fullscreen"], ["T", "12 / 24-hour"], ["Esc", "Exit fullscreen"]]} />
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+/* ================================================================
+   TIMER PAGE
+   ================================================================ */
+const PRESETS = [1, 5, 10, 15, 25, 30, 60];
+function TimerCard({ t, selected, onSelect }) {
+  const { tapi, push } = useCtx();
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(t.name);
+  const [confirm, setConfirm] = useState(false);
+  const now = useNow(250);
+  const rem = t.running ? Math.max(0, t.endAt - now.getTime()) : (t.completed ? 0 : t.remainingMs);
+  const prog = t.durationMs > 0 ? (t.completed ? 0 : rem / t.durationMs) : 0;
+
+  const saveName = () => { tapi.rename(t.id, name.trim() || "Timer"); setEditing(false); };
+  const toggle = () => {
+    if (t.completed) { tapi.reset(t.id); tapi.start(t.id); }
+    else if (t.running) tapi.pause(t.id);
+    else tapi.start(t.id);
+  };
+
+  return (
+    <article className={"panel p-5 flex flex-col gap-4 cursor-default" + (selected ? " sel-ring" : "")}
+      onClick={onSelect}>
+      <div className="flex items-center gap-2 w-full">
+        {editing ? (
+          <input className="inp text-sm" value={name} autoFocus onChange={e => setName(e.target.value)}
+            onBlur={saveName} onKeyDown={e => { if (e.key === "Enter") saveName(); }}
+            aria-label="Timer name" onClick={e => e.stopPropagation()} />
+        ) : (
+          <button className="font-medium text-sm truncate flex items-center gap-2 hover:text-acc transition-colors"
+            onClick={e => { e.stopPropagation(); setName(t.name); setEditing(true); }} aria-label={"Rename " + t.name}>
+            {t.name}<Icon name="pencil" size={13} className="text-mut" />
+          </button>
+        )}
+        <button className="icon-btn ml-auto shrink-0" style={{ width: 30, height: 30 }}
+          aria-label={"Delete " + t.name}
+          onClick={e => {
+            e.stopPropagation();
+            if (confirm) { tapi.remove(t.id); push("Timer deleted"); }
+            else { setConfirm(true); setTimeout(() => setConfirm(false), 2500); }
+          }}>
+          <Icon name={confirm ? "check" : "trash"} size={15} className={confirm ? "text-danger" : ""} />
+        </button>
+      </div>
+
+      <div className="flex justify-center py-1">
+        <ProgressRing progress={prog} size={186}>
+          {t.completed ? (
+            <div className="text-center px-4">
+              <div className="text-acc text-sm font-semibold">Time's up</div>
+              <div className="text-xs text-mut mt-1">{t.name}</div>
+            </div>
+          ) : (
+            <div className="text-center">
+              <div className="num text-[2rem] font-semibold leading-none">{fmtDur(rem)}</div>
+              <div className="text-[10px] uppercase tracking-[.15em] text-mut mt-2">of {fmtDur(t.durationMs)}</div>
+            </div>
+          )}
+        </ProgressRing>
+      </div>
+
+      <div className="flex justify-center gap-2 flex-wrap">
+        {t.completed ? (
+          <React.Fragment>
+            <button className="btn btn-primary" onClick={e => { e.stopPropagation(); tapi.reset(t.id); tapi.start(t.id); }}>
+              <Icon name="play" size={14} /> Restart
+            </button>
+            <button className="btn" onClick={e => { e.stopPropagation(); tapi.reset(t.id); }}>Set new timer</button>
+            {!t.silenced && (
+              <button className="btn" onClick={e => { e.stopPropagation(); tapi.silence(t.id); }} aria-label="Stop the sound">
+                <Icon name="volume" size={14} /> Silence
+              </button>
+            )}
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <button className="btn btn-primary min-w-[104px]" onClick={e => { e.stopPropagation(); toggle(); }}>
+              <Icon name={t.running ? "pause" : "play"} size={14} />
+              {t.running ? "Pause" : rem < t.durationMs ? "Resume" : "Start"}
+            </button>
+            <button className="btn" disabled={!t.running && rem === t.durationMs && !t.completed}
+              onClick={e => { e.stopPropagation(); tapi.reset(t.id); }}>
+              <Icon name="reset" size={14} /> Reset
+            </button>
+          </React.Fragment>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function TimerPage() {
+  const { settings, timers, tapi, push } = useCtx();
+  const [h, setH] = useState(0);
+  const [m, setM] = useState(settings.defaultTimerMin || 5);
+  const [s, setS] = useState(0);
+  const [label, setLabel] = useState("");
+  const [err, setErr] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const nameRef = useRef(null);
+  const [perm, setPerm] = useState(() => "Notification" in window ? Notification.permission : "unsupported");
+
+  const sel = timers.find(t => t.id === selected) || timers[0];
+  const shortcuts = useMemo(() => ({
+    Space: () => { if (!sel) return; if (sel.completed) { tapi.reset(sel.id); tapi.start(sel.id); } else if (sel.running) tapi.pause(sel.id); else tapi.start(sel.id); },
+    KeyR: () => { if (sel) { tapi.reset(sel.id); push("Timer reset"); } },
+    KeyN: () => { if (nameRef.current) { nameRef.current.scrollIntoView({ block: "center", behavior: "smooth" }); nameRef.current.focus(); } },
+  }), [sel && sel.id, sel && sel.running, sel && sel.completed]);
+  useShortcuts(shortcuts);
+
+  const add = () => {
+    const ms = ((+h) * 3600 + (+m) * 60 + (+s)) * 1000;
+    if (!ms) { setErr(true); return; }
+    setErr(false);
+    const id = tapi.add(label.trim(), ms);
+    if (id) { setSelected(id); setLabel(""); push("Timer added"); }
+  };
+  const clamp = (v, max) => { const n = parseInt(v, 10); return isNaN(n) ? 0 : Math.min(max, Math.max(0, n)); };
+
+  return (
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8">
+      <div>
+        <PageHead icon="timer" title="FREE ONLINE TIMER"
+          desc={["Countdown timer with ring, sound and notifications",
+            "Set hours, minutes and seconds — or tap a preset. Run multiple labeled timers at once; they keep counting accurately even when you switch tabs."]} />
+
+        {perm === "default" && (
+          <div className="panel p-4 mb-5 flex flex-wrap items-center gap-3">
+            <span className="text-acc"><Icon name="alarm" size={16} /></span>
+            <p className="text-xs text-mut flex-1 min-w-[200px]">Get a desktop notification when a timer finishes — useful while you work in another tab.</p>
+            <button className="btn text-xs" onClick={() => requestNotify().then(p => { setPerm(p); if (p === "granted") push("Notifications enabled"); })}>
+              Enable notifications
+            </button>
+          </div>
+        )}
+        {perm === "denied" && (
+          <p className="text-xs text-mut mb-4 flex items-center gap-2"><Icon name="info" size={14} /> Notifications are blocked in your browser settings — the in-page alarm sound still works.</p>
+        )}
+
+        {/* composer */}
+        <div className="panel p-5">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h2 className="text-sm font-semibold flex items-center gap-2"><Icon name="plus" size={15} /> New timer</h2>
+            <span className="text-xs text-mut">Default {settings.defaultTimerMin} min — change it in Settings</span>
+          </div>
+          <div className="flex flex-wrap gap-3 items-end">
+            {[["Hours", h, setH, 23], ["Minutes", m, setM, 59], ["Seconds", s, setS, 59]].map(([lab, val, set, max]) => (
+              <label key={lab} className="block w-[72px]">
+                <span className="block text-[10px] uppercase tracking-[.14em] text-mut mb-1.5">{lab}</span>
+                <input type="number" min="0" max={max} className="inp num text-center" value={val}
+                  onChange={e => set(clamp(e.target.value, max))} aria-label={lab} />
+              </label>
+            ))}
+            <label className="block flex-1 min-w-[160px]">
+              <span className="block text-[10px] uppercase tracking-[.14em] text-mut mb-1.5">Label (optional)</span>
+              <input className="inp" placeholder="e.g. Focus block" value={label} onChange={e => setLabel(e.target.value)}
+                ref={nameRef} onKeyDown={e => { if (e.key === "Enter") add(); }} aria-label="Timer label" />
+            </label>
+            <button className="btn btn-primary" onClick={add}><Icon name="plus" size={15} /> Add timer</button>
+          </div>
+          {err && <p className="text-xs mt-3" style={{ color: "var(--danger)" }}>Set a duration greater than zero.</p>}
+          <div className="mt-4 flex flex-wrap gap-2">
+            {PRESETS.map(min => (
+              <button key={min} className="chip" onClick={() => { setH(0); setM(min); setS(0); setErr(false); }}>
+                {min} min
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* timer cards */}
+        {timers.length === 0 ? (
+          <div className="panel p-10 mt-5 text-center">
+            <div className="text-mut flex justify-center mb-3"><Icon name="timer" size={26} /></div>
+            <p className="text-sm font-medium">No timers yet</p>
+            <p className="text-xs text-mut mt-1">Pick a duration above — or tap a preset like 25 min for a focus block.</p>
+          </div>
+        ) : (
+          <div className="mt-5 grid sm:grid-cols-2 gap-4" style={{ maxWidth: timers.length === 1 ? 420 : undefined, margin: timers.length === 1 ? "20px auto 0" : undefined }}>
+            {timers.map(t => (
+              <TimerCard key={t.id} t={t} selected={sel && sel.id === t.id} onSelect={() => setSelected(t.id)} />
+            ))}
+          </div>
+        )}
+      </div>
+      <aside className="hidden lg:block">
+        <div className="sticky top-24">
+          <MiniShortcuts items={[["Space", "Start / pause"], ["R", "Reset selected"], ["N", "New timer"]]} />
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+/* ================================================================
+   STOPWATCH PAGE
+   ================================================================ */
+function StopwatchPage() {
+  const { push } = useCtx();
+  const [sw, setSw] = usePersisted("stopwatch", { running: false, startAt: null, acc: 0, laps: [] });
+  const [, tick] = useReducer(x => x + 1, 0);
+  const running = sw.running;
+
+  useEffect(() => {
+    if (!running) return;
+    let raf;
+    const loop = () => { tick(); raf = requestAnimationFrame(loop); };
+    raf = requestAnimationFrame(loop);
+    const onVis = () => tick();
+    document.addEventListener("visibilitychange", onVis);
+    return () => { cancelAnimationFrame(raf); document.removeEventListener("visibilitychange", onVis); };
+  }, [running]);
+
+  const elapsed = sw.acc + (sw.running && sw.startAt ? Date.now() - sw.startAt : 0);
+  const start = () => { AudioEngine.ensure(); setSw(s => ({ ...s, running: true, startAt: Date.now() })); };
+  const pause = () => setSw(s => ({ ...s, running: false, acc: s.acc + (s.startAt ? Date.now() - s.startAt : 0), startAt: null }));
+  const reset = () => setSw({ running: false, startAt: null, acc: 0, laps: [] });
+  const lap = () => {
+    setSw(s => ({ ...s, laps: [...(s.laps || []), s.acc + (s.startAt ? Date.now() - s.startAt : 0)] }));
+    AudioEngine.beep(660, 0.06, 0, "square", 0.07);
+  };
+  const shortcuts = useMemo(() => ({
+    Space: () => running ? pause() : start(),
+    KeyL: () => { if (running) lap(); },
+    KeyR: () => reset(),
+  }), [running]);
+  useShortcuts(shortcuts);
+
+  const laps = sw.laps || [];
+  const deltas = laps.map((t, i) => t - (i ? laps[i - 1] : 0));
+  const fastest = deltas.length > 1 ? deltas.indexOf(Math.min(...deltas)) : -1;
+  const slowest = deltas.length > 1 ? deltas.indexOf(Math.max(...deltas)) : -1;
+
+  return (
+    <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-8">
+      <div>
+        <PageHead icon="stopwatch" title="STOPWATCH ONLINE"
+          desc={["Precision stopwatch with lap splits",
+            "Millisecond display, unlimited laps, and automatic highlighting of your fastest and slowest splits. The clock keeps perfect time even if you switch tabs."]} />
+
+        <div className="panel py-14 sm:py-20 px-4 text-center">
+          <div className="num font-semibold leading-none tracking-tight text-[clamp(2.8rem,10vw,7rem)]" role="timer" aria-live="off" aria-label={fmtSW(elapsed)}>
+            {fmtSW(elapsed)}
+          </div>
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <button className="btn btn-primary min-w-[120px]" onClick={running ? pause : start} disabled={false}>
+              <Icon name={running ? "pause" : "play"} size={15} />
+              {running ? "Pause" : elapsed > 0 ? "Resume" : "Start"}
+            </button>
+            <button className="btn min-w-[100px]" onClick={lap} disabled={!running}><Icon name="flag" size={14} /> Lap</button>
+            <button className="btn min-w-[100px]" onClick={reset} disabled={elapsed === 0 && !laps.length}>
+              <Icon name="reset" size={14} /> Reset
+            </button>
+          </div>
+        </div>
+
+        <div className="panel mt-6 overflow-hidden">
+          <div className="px-5 py-4 flex items-center justify-between border-b border-line">
+            <h2 className="text-sm font-semibold flex items-center gap-2"><Icon name="flag" size={15} /> Laps <span className="text-mut font-normal num">({laps.length})</span></h2>
+            {laps.length > 0 && <button className="btn text-xs" onClick={() => { setSw(s => ({ ...s, laps: [] })); push("Laps cleared"); }}>Clear all laps</button>}
+          </div>
+          {laps.length === 0 ? (
+            <p className="px-5 py-10 text-center text-sm text-mut">
+              No laps yet — press <kbd className="kbd">L</kbd> or tap Lap while the stopwatch is running.
+            </p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-[10px] uppercase tracking-[.14em] text-mut border-b border-line">
+                  <th scope="col" className="px-5 py-3 font-medium">Lap</th>
+                  <th scope="col" className="px-5 py-3 font-medium">Split</th>
+                  <th scope="col" className="px-5 py-3 font-medium">Total</th>
+                  <th scope="col" className="px-5 py-3 font-medium sr-only">Note</th>
+                </tr>
+              </thead>
+              <tbody className="num">
+                {laps.map((t, i) => {
+                  const idx = laps.length - 1 - i;
+                  const d = deltas[idx];
+                  return (
+                    <tr key={idx} className="border-b border-line last:border-0">
+                      <td className="px-5 py-3">{idx + 1}</td>
+                      <td className={"px-5 py-3 font-medium" + (idx === fastest ? " text-acc" : "")}>{fmtSW(d)}
+                        {idx === fastest && <span className="ml-2 align-middle inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-acc"><Icon name="zap" size={11} /> Fastest</span>}
+                        {idx === slowest && <span className="ml-2 text-[10px] uppercase tracking-wider text-mut">Slowest</span>}
+                      </td>
+                      <td className="px-5 py-3 text-mut">{fmtSW(t)}</td>
+                      <td className="px-5 py-3 sr-only">{idx === fastest ? "Fastest lap" : idx === slowest ? "Slowest lap" : ""}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+      <aside className="hidden lg:block">
+        <div className="sticky top-24">
+          <MiniShortcuts items={[["Space", "Start / pause"], ["L", "Record lap"], ["R", "Reset"]]} />
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+/* ================================================================
+   ALARM PAGE
+   ================================================================ */
+const TONES = ["chime", "beep", "bell", "digital"];
+const DAY_CHIPS = [["S", 0], ["M", 1], ["T", 2], ["W", 3], ["T", 4], ["F", 5], ["S", 6]];
+
+function AlarmPage() {
+  const { settings, alarms, aapi, push } = useCtx();
+  const now = useNow(1000);
+  const [name, setName] = useState("");
+  const [time, setTime] = useState("07:30");
+  const [days, setDays] = useState([]);
+  const [tone, setTone] = useState("chime");
+  const [editingId, setEditingId] = useState(null);
+  const [confirmId, setConfirmId] = useState(null);
+  const [perm, setPerm] = useState(() => "Notification" in window ? Notification.permission : "unsupported");
+
+  const resetForm = () => { setName(""); setTime("07:30"); setDays([]); setTone("chime"); setEditingId(null); };
+  const submit = () => {
+    if (editingId) {
+      aapi.update(editingId, { name: name.trim() || "Alarm", time, days, tone });
+      push("Alarm updated");
+    } else {
+      aapi.add({ name: name.trim() || "Alarm", time, days, tone });
+      push("Alarm set for " + fmtStoredTime(time, settings.timeFormat === "12"));
+      if (perm === "default") requestNotify().then(p => { setPerm(p); if (p === "granted") push("Notifications enabled for alarms"); });
+    }
+    resetForm();
+  };
+  const startEdit = (a) => {
+    setEditingId(a.id); setName(a.name); setTime(a.time); setDays([...(a.days || [])]); setTone(a.tone || "chime");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <div>
+      <PageHead icon="alarm" title="ONLINE ALARM CLOCK"
+        desc={["Alarms that ring right in your browser",
+          "Set one-time or repeating alarms with custom names and tones. They work even in a background tab — just keep this site open."]} />
+
+      {perm === "denied" && (
+        <p className="text-xs text-mut mb-4 flex items-center gap-2">
+          <Icon name="belloff" size={14} /> Notifications are blocked — alarms will still ring inside this tab.
+        </p>
+      )}
+
+      {/* composer */}
+      <div className="panel p-5">
+        <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
+          <Icon name={editingId ? "pencil" : "plus"} size={15} /> {editingId ? "Edit alarm" : "New alarm"}
+        </h2>
+        <div className="flex flex-wrap gap-3 items-end">
+          <label className="block flex-1 min-w-[150px]">
+            <span className="block text-[10px] uppercase tracking-[.14em] text-mut mb-1.5">Name</span>
+            <input className="inp" placeholder="e.g. Wake up" value={name} onChange={e => setName(e.target.value)} aria-label="Alarm name" />
+          </label>
+          <label className="block">
+            <span className="block text-[10px] uppercase tracking-[.14em] text-mut mb-1.5">Time</span>
+            <input type="time" className="inp num" value={time} onChange={e => setTime(e.target.value)} aria-label="Alarm time" />
+          </label>
+          <label className="block">
+            <span className="block text-[10px] uppercase tracking-[.14em] text-mut mb-1.5">Tone</span>
+            <span className="flex gap-2">
+              <select className="sel" value={tone} onChange={e => setTone(e.target.value)} aria-label="Alarm tone">
+                {TONES.map(t => <option key={t} value={t}>{t[0].toUpperCase() + t.slice(1)}</option>)}
+              </select>
+              <button className="btn" onClick={() => AudioEngine.tone(tone)} aria-label="Preview tone"><Icon name="volume" size={15} /></button>
+            </span>
+          </label>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <span className="text-[10px] uppercase tracking-[.14em] text-mut">Repeat</span>
+          <div className="flex gap-1.5">
+            {DAY_CHIPS.map(([lab, idx], i) => (
+              <button key={i} className={"chip w-9 justify-center" + (days.includes(idx) ? " chip-on" : "")}
+                aria-pressed={days.includes(idx)} aria-label={["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][idx]}
+                onClick={() => setDays(d => d.includes(idx) ? d.filter(x => x !== idx) : [...d, idx])}>
+                {lab}
+              </button>
+            ))}
+          </div>
+          {days.length === 0 && <span className="text-xs text-mut">No repeat — one-time alarm</span>}
+          <div className="ml-auto flex gap-2">
+            {editingId && <button className="btn" onClick={resetForm}>Cancel</button>}
+            <button className="btn btn-primary" onClick={submit}>{editingId ? "Save changes" : "Add alarm"}</button>
+          </div>
+        </div>
+        <p className="text-[11px] text-mut mt-3">The time field follows your device locale; the displayed time follows your 12/24-hour setting.</p>
+      </div>
+
+      {/* list */}
+      <div className="mt-5 space-y-3">
+        {alarms.length === 0 ? (
+          <div className="panel p-10 text-center">
+            <div className="text-mut flex justify-center mb-3"><Icon name="alarm" size={26} /></div>
+            <p className="text-sm font-medium">No alarms yet</p>
+            <p className="text-xs text-mut mt-1">Set a time above — one-time or repeating on the weekdays you choose.</p>
+          </div>
+        ) : alarms.map(a => {
+          const occ = a.enabled ? (a.snoozeAt && a.snoozeAt > now.getTime() ? new Date(a.snoozeAt) : nextAlarmOccurrence(a, now)) : null;
+          return (
+            <div key={a.id} className="panel p-4 flex items-center gap-4">
+              <Switch checked={a.enabled} onChange={() => aapi.toggle(a.id)} label={"Toggle alarm " + a.name} />
+              <div className="min-w-0 flex-1">
+                <div className="font-medium text-sm truncate">{a.name}</div>
+                <div className="text-xs text-mut mt-0.5">{repeatLabel(a.days)} · {a.tone} tone{!a.enabled && " · off"}</div>
+              </div>
+              <div className="text-right shrink-0">
+                <div className={"num text-2xl font-semibold" + (a.enabled ? "" : " text-mut line-through opacity-70")}>
+                  {fmtStoredTime(a.time, settings.timeFormat === "12")}
+                </div>
+                {a.enabled && occ && <div className="text-[11px] text-mut num mt-0.5">in {fmtSpan(occ.getTime() - now.getTime())}</div>}
+              </div>
+              <div className="flex gap-1 shrink-0">
+                <button className="icon-btn" style={{ width: 32, height: 32 }} aria-label={"Edit " + a.name} onClick={() => startEdit(a)}>
+                  <Icon name="pencil" size={14} />
+                </button>
+                {confirmId === a.id ? (
+                  <button className="icon-btn danger" style={{ width: 32, height: 32 }} aria-label="Confirm delete"
+                    onClick={() => { aapi.remove(a.id); setConfirmId(null); push("Alarm deleted"); }}>
+                    <Icon name="check" size={14} />
+                  </button>
+                ) : (
+                  <button className="icon-btn" style={{ width: 32, height: 32 }} aria-label={"Delete " + a.name}
+                    onClick={() => { setConfirmId(a.id); setTimeout(() => setConfirmId(c => c === a.id ? null : c), 2500); }}>
+                    <Icon name="trash" size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="panel p-4 mt-6 flex gap-3 items-start">
+        <span className="text-acc mt-0.5"><Icon name="info" size={16} /></span>
+        <p className="text-xs text-mut leading-relaxed">
+          Alarms work while this tab is open — including in a background tab. If you close the browser entirely,
+          or your device sleeps, the alarm may be delayed or silent. For critical wake-ups, keep DarkClock Pro
+          open in a tab and leave your display awake.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   WORLD CLOCK PAGE
+   ================================================================ */
+function WorldPage() {
+  const { settings, push } = useCtx();
+  const [list, setList] = usePersisted("world", ["America/New_York", "Europe/London", "Asia/Tokyo"]);
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const now = useNow(1000);
+  const hour12 = settings.timeFormat === "12";
+
+  const results = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return [];
+    return CITIES.filter(c => (c[0] + " " + c[1] + " " + c[2]).toLowerCase().includes(s)).slice(0, 8);
+  }, [q]);
+
+  const add = (tz) => {
+    if (list.includes(tz)) { push("That clock is already on your list", "info"); setQ(""); setOpen(false); return; }
+    setList(l => [...l, tz]); setQ(""); setOpen(false); push("World clock added", "globe");
+  };
+  const localOff = -now.getTimezoneOffset();
+
+  return (
+    <div>
+      <PageHead icon="globe" title="WORLD CLOCK"
+        desc={["Current time in cities around the world",
+          "Add any city to see its live time, date and difference from your local clock. Daylight saving is handled automatically for every zone."]} />
+
+      <div className="relative max-w-md">
+        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-mut pointer-events-none"><Icon name="search" size={16} /></span>
+        <input className="inp pl-10" placeholder="Search a city or time zone…" value={q} aria-label="Search cities"
+          onChange={e => { setQ(e.target.value); setOpen(true); }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={e => { if (e.key === "Escape") setOpen(false); }} />
+        {open && results.length > 0 && (
+          <div className="absolute left-0 right-0 top-full mt-2 panel overflow-hidden z-20" style={{ boxShadow: "var(--shadow)" }} role="listbox">
+            {results.map(c => (
+              <button key={c[2] + c[0]} role="option" aria-selected="false" className="w-full text-left px-4 py-3 flex items-center justify-between gap-3 hover:bg-card2 transition-colors"
+                onMouseDown={() => add(c[2])}>
+                <span className="text-sm">{c[0]}<span className="text-mut text-xs ml-2">{c[1]}</span></span>
+                <span className="num text-xs text-mut">{fmtOffset(tzOffsetMin(c[2], now))}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      <p className="text-xs text-mut mt-3">Your time zone: {Intl.DateTimeFormat().resolvedOptions().timeZone || "local"} · {fmtOffset(localOff)}</p>
+
+      {list.length === 0 ? (
+        <div className="panel p-10 mt-6 text-center">
+          <div className="text-mut flex justify-center mb-3"><Icon name="globe" size={26} /></div>
+          <p className="text-sm font-medium">No world clocks yet</p>
+          <p className="text-xs text-mut mt-1 mb-4">Search above, or start with a few favorites:</p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {[["New York", "America/New_York"], ["London", "Europe/London"], ["Tokyo", "Asia/Tokyo"], ["Sydney", "Australia/Sydney"]].map(([c, tz]) => (
+              <button key={tz} className="chip" onClick={() => add(tz)}>{c}</button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {list.map(tz => {
+            const city = CITIES.find(c => c[2] === tz);
+            const p = getTimeParts(tz, now, hour12);
+            const off = tzOffsetMin(tz, now);
+            const shift = dayShift(tz, now);
+            return (
+              <div key={tz} className="panel p-5 group relative">
+                <button className="icon-btn absolute top-3 right-3 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                  style={{ width: 30, height: 30 }} aria-label={"Remove " + (city ? city[0] : tz)}
+                  onClick={() => { setList(l => l.filter(x => x !== tz)); push("Clock removed"); }}>
+                  <Icon name="x" size={14} />
+                </button>
+                <div className="font-medium text-sm">{city ? city[0] : tz.split("/").pop().replace(/_/g, " ")}</div>
+                <div className="text-xs text-mut">{city ? city[1] : "Time zone"}</div>
+                <div className="num mt-4 flex items-baseline gap-2">
+                  <span className="text-3xl font-semibold leading-none">{p.h}:{p.m}</span>
+                  <span className="text-acc text-sm font-medium">{p.s}</span>
+                  {p.ap && <span className="text-xs text-mut font-medium">{p.ap}</span>}
+                </div>
+                <div className="text-xs text-mut mt-1.5">{getShortDate(tz, now)}</div>
+                <div className="flex flex-wrap gap-1.5 mt-4">
+                  <span className="chip" style={{ cursor: "default" }}>{fmtOffset(off)}</span>
+                  <span className="chip" style={{ cursor: "default" }}>{fmtDiff(off - localOff)}</span>
+                  {shift && <span className="chip chip-on" style={{ cursor: "default" }}>{shift}</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ================================================================
+   SETTINGS PAGE
+   ================================================================ */
+function SettingsPage() {
+  const { settings, update, setSettings, push } = useCtx();
+  const [confirm, setConfirm] = useState(false);
+  const perm = "Notification" in window ? Notification.permission : "unsupported";
+  const permText = { granted: "Allowed", denied: "Blocked by browser", default: "Not requested yet", unsupported: "Not supported in this browser" }[perm];
+
+  return (
+    <div className="max-w-3xl">
+      <PageHead icon="settings" title="SETTINGS"
+        desc={["Make DarkClock Pro yours",
+          "Theme, format, sound and clock preferences — saved on this device only, never sent anywhere."]} />
+
+      <section className="panel p-6 mb-5">
+        <h2 className="text-sm font-semibold mb-1">Appearance & time</h2>
+        <Row label="Theme" hint="Dark is the default; light mode is here if you need it">
+          <Seg value={settings.theme} onChange={v => update({ theme: v })} ariaLabel="Theme"
+            options={[{ value: "dark", label: "Dark", icon: "moon" }, { value: "light", label: "Light", icon: "sun" }]} />
+        </Row>
+        <Row label="Time format">
+          <Seg value={settings.timeFormat} onChange={v => update({ timeFormat: v })} ariaLabel="Time format"
+            options={[{ value: "12", label: "12-hour" }, { value: "24", label: "24-hour" }]} />
+        </Row>
+        <Row label="Clock style" hint="Used on the Clock page and in fullscreen">
+          <Seg value={settings.clockStyle} onChange={v => update({ clockStyle: v })} ariaLabel="Clock style"
+            options={[{ value: "digital", label: "Digital" }, { value: "minimal", label: "Minimal" }, { value: "flip", label: "Flip" }]} />
+        </Row>
+        <Row label="Show seconds on the clock">
+          <Switch checked={settings.showSeconds} onChange={v => update({ showSeconds: v })} label="Show seconds" />
+        </Row>
+        <Row label="Show the date">
+          <Switch checked={settings.showDate} onChange={v => update({ showDate: v })} label="Show date" />
+        </Row>
+        <Row label="Display time zone" hint="‘Device time (auto)’ follows wherever you are">
+          <TzSelect value={settings.displayTz} onChange={v => update({ displayTz: v })} />
+        </Row>
+      </section>
+
+      <section className="panel p-6 mb-5">
+        <h2 className="text-sm font-semibold mb-1">Sound & notifications</h2>
+        <Row label="Sound" hint="Timer and alarm tones — generated locally, no files downloaded">
+          <div className="flex items-center gap-3">
+            <button className="icon-btn" aria-label="Preview tone" onClick={() => AudioEngine.tone("chime")}><Icon name="volume" size={16} /></button>
+            <Switch checked={settings.sound} onChange={v => update({ sound: v })} label="Sound" />
+          </div>
+        </Row>
+        <Row label="Browser notifications" hint={"Permission status: " + permText}>
+          <div className="flex items-center gap-3">
+            {perm === "default" && (
+              <button className="btn text-xs" onClick={() => requestNotify().then(p => {
+                if (p === "granted") push("Notifications enabled");
+                else if (p === "denied") push("Blocked — change it in your browser's site settings", "info");
+              })}>Allow</button>
+            )}
+            <Switch checked={settings.notify} onChange={v => {
+              update({ notify: v });
+              if (v && perm === "default") requestNotify().then(p => { if (p === "granted") push("Notifications enabled"); });
+            }} label="Browser notifications" />
+          </div>
+        </Row>
+        {perm === "denied" && (
+          <p className="text-xs text-mut mt-2">Notifications are blocked for this site. Re-enable them in your browser's site settings if you want desktop alerts.</p>
+        )}
+        <Row label="Default timer duration" hint="Pre-filled when you create a new timer">
+          <select className="sel" value={settings.defaultTimerMin} onChange={e => update({ defaultTimerMin: +e.target.value })} aria-label="Default timer duration">
+            {PRESETS.map(m => <option key={m} value={m}>{m} minutes</option>)}
+          </select>
+        </Row>
+      </section>
+
+      <section className="panel p-6 mb-5">
+        <h2 className="text-sm font-semibold mb-4 flex items-center gap-2"><Icon name="keyboard" size={16} /> Keyboard shortcuts</h2>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-[10px] uppercase tracking-[.14em] text-mut border-b border-line">
+              <th scope="col" className="pb-2 font-medium">Key</th>
+              <th scope="col" className="pb-2 font-medium">Where</th>
+              <th scope="col" className="pb-2 font-medium">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {SHORTCUTS.map(([k, w, a]) => (
+              <tr key={k + w} className="border-b border-line last:border-0">
+                <td className="py-2.5"><kbd className="kbd">{k}</kbd></td>
+                <td className="py-2.5 text-mut">{w}</td>
+                <td className="py-2.5">{a}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+
+      <section className="panel p-6">
+        <h2 className="text-sm font-semibold mb-1">Reset</h2>
+        <p className="text-xs text-mut mb-4">Restores theme, format, sound and clock preferences to their defaults. Your timers and alarms are kept.</p>
+        <button className={"btn" + (confirm ? " btn-danger" : "")}
+          onClick={() => {
+            if (!confirm) { setConfirm(true); setTimeout(() => setConfirm(false), 3000); }
+            else { setSettings({ ...DEFAULT_SETTINGS }); setConfirm(false); push("Settings restored to defaults", "reset"); }
+          }}>
+          <Icon name="reset" size={14} /> {confirm ? "Click again to confirm" : "Reset settings"}
+        </button>
+      </section>
+    </div>
+  );
+}
+
+/* ================================================================
+   STATIC PAGES
+   ================================================================ */
+function StaticPage({ kicker, title, children }) {
+  return (
+    <article className="max-w-2xl mx-auto">
+      <PageHead icon="file" title={kicker} desc={[title, ""]} />
+      <div className="space-y-5 text-sm leading-relaxed text-mut pb-4 [&_h2]:text-ink [&_h2]:text-base [&_h2]:font-semibold [&_h2]:mt-8 [&_a]:text-acc [&_a]:hover:underline">{children}</div>
+    </article>
+  );
+}
+function AboutPage() {
+  return (
+    <StaticPage kicker="ABOUT" title="Time tools that respect your attention">
+      <p>
+        DarkClock Pro started with a simple observation: most online clocks bury a useful tool under pop-ups,
+        fake buttons and auto-playing video. This is the opposite of that — a quiet, black, precise set of time
+        tools that loads instantly and stays out of your way.
+      </p>
+      <h2>What's inside</h2>
+      <ul className="space-y-2 list-none">
+        {[
+          ["clock", "A large online clock with digital, minimal and flip styles, plus a fullscreen study mode"],
+          ["timer", "A free online timer with presets, progress ring, sound and desktop notifications"],
+          ["stopwatch", "A millisecond stopwatch with lap splits and fastest/slowest highlighting"],
+          ["alarm", "An online alarm clock with weekday repeat, custom tones and snooze"],
+          ["globe", "A world clock for any city, with automatic daylight-saving handling"],
+        ].map(([ic, t]) => (
+          <li key={t} className="flex gap-3 items-start"><span className="text-acc mt-0.5"><Icon name={ic} size={16} /></span>{t}</li>
+        ))}
+      </ul>
+      <h2>Private by design</h2>
+      <p>
+        There is no account, no server and no tracking of what you time. Every calculation — the clock, the
+        countdown, the laps — happens in your browser. Your settings, alarms and world clocks live in your own
+        browser storage and never leave your device.
+      </p>
+      <h2>For study, focus and the desk</h2>
+      <p>
+        The fullscreen clock was built for study sessions and desk setups: enormous tabular numerals, a
+        seconds ruler you can read across the room, and keyboard shortcuts for everything that matters.
+      </p>
+    </StaticPage>
+  );
+}
+function ContactPage() {
+  const [sent, setSent] = useState(false);
+  const onSubmit = (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const subject = encodeURIComponent("DarkClock Pro — " + (fd.get("topic") || "Hello"));
+    const body = encodeURIComponent("From: " + fd.get("name") + " <" + fd.get("email") + ">\n\n" + fd.get("message"));
+    window.location.href = "mailto:" + SITE_CONFIG.contactEmail + "?subject=" + subject + "&body=" + body;
+    setSent(true);
+  };
+  return (
+    <StaticPage kicker="CONTACT" title="Say hello">
+      <p>
+        Found a bug, have an idea, or just want to say the flip clock made your day? Send a message — it opens
+        your own email app, so nothing is submitted to a server here.
+      </p>
+      <form className="space-y-4" onSubmit={onSubmit}>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <label className="block">
+            <span className="block text-[10px] uppercase tracking-[.14em] text-mut mb-1.5">Your name</span>
+            <input name="name" required className="inp" autoComplete="name" />
+          </label>
+          <label className="block">
+            <span className="block text-[10px] uppercase tracking-[.14em] text-mut mb-1.5">Your email</span>
+            <input name="email" type="email" required className="inp" autoComplete="email" />
+          </label>
+        </div>
+        <label className="block">
+          <span className="block text-[10px] uppercase tracking-[.14em] text-mut mb-1.5">Topic</span>
+          <select name="topic" className="sel w-full">
+            <option>Feedback</option><option>Bug report</option><option>Feature idea</option><option>Business</option>
+          </select>
+        </label>
+        <label className="block">
+          <span className="block text-[10px] uppercase tracking-[.14em] text-mut mb-1.5">Message</span>
+          <textarea name="message" required rows="5" className="inp" style={{ resize: "vertical" }} />
+        </label>
+        <button type="submit" className="btn btn-primary"><Icon name="mail" size={15} /> Compose email</button>
+        {sent && <p className="text-xs text-mut">Your email app should have opened. If not, write to {SITE_CONFIG.contactEmail} directly.</p>}
+      </form>
+    </StaticPage>
+  );
+}
+function PrivacyPage() {
+  return (
+    <StaticPage kicker="PRIVACY POLICY" title="Your data stays with you">
+      <p>Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+      <h2>The short version</h2>
+      <p>
+        DarkClock Pro runs entirely in your browser. We do not operate user accounts, we do not receive your
+        timers, alarms, laps or settings, and we do not sell anything about you — there is simply no server on
+        the other end collecting it.
+      </p>
+      <h2>What is stored on your device</h2>
+      <p>
+        Your preferences (theme, time format, clock style), your timers, alarms and world-clock selection are
+        saved in your browser's localStorage under the <code className="text-ink">dcp.*</code> keys. This is what
+        makes your alarms survive a page refresh. You can erase it at any time via "Reset settings" or by
+        clearing site data in your browser.
+      </p>
+      <h2>Notifications</h2>
+      <p>
+        If you allow browser notifications, they are used only to alert you when a timer finishes or an alarm
+        rings. Permission is requested only when you choose to enable it, and you can revoke it in your browser
+        at any time.
+      </p>
+      <h2>No advertising</h2>
+      <p>
+        This site displays no advertisements, uses no advertising networks, and sets no tracking or marketing
+        cookies.
+      </p>
+      <h2>Changes</h2>
+      <p>If this policy changes, the updated date above will change with it.</p>
+    </StaticPage>
+  );
+}
+function TermsPage() {
+  return (
+    <StaticPage kicker="TERMS & CONDITIONS" title="The fine print, kept short">
+      <p>Last updated: {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
+      <h2>Use of the service</h2>
+      <p>
+        DarkClock Pro is provided free of charge for personal use. By using it you agree to use it lawfully and
+        not to abuse it (for example, by automated scraping or attempting to disrupt the service).
+      </p>
+      <h2>No warranty</h2>
+      <p>
+        The site is provided "as is" without warranties of any kind. Timekeeping depends on your device's
+        clock, browser and power state; alarms and timers may be affected if the browser is closed or the
+        device sleeps, so please don't rely on it for safety-critical wake-ups.
+      </p>
+      <h2>Limitation of liability</h2>
+      <p>
+        To the maximum extent permitted by law, the authors are not liable for any damages arising from the use
+        or inability to use this site, including missed alarms or timers.
+      </p>
+      <h2>Contact</h2>
+      <p>Questions about these terms? Reach us via the <a href="#/contact">contact page</a>.</p>
+    </StaticPage>
+  );
+}
+
+/* ================================================================
+   OVERLAYS: alarm ringing + finished timer
+   ================================================================ */
+function AlarmRinging({ alarm, onDismiss, onSnooze }) {
+  const { settings } = useCtx();
+  const now = useNow(1000);
+  const p = getTimeParts(settings.displayTz, now, settings.timeFormat === "12");
+  useEffect(() => {
+    document.body.classList.add("locked");
+    return () => document.body.classList.remove("locked");
+  }, []);
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-6"
+      style={{ background: "rgba(5,5,5,.9)", backdropFilter: "blur(10px)" }}
+      role="alertdialog" aria-modal="true" aria-label="Alarm ringing">
+      <div className="text-center panel px-8 sm:px-16 py-12" style={{ boxShadow: "var(--shadow)" }}>
+        <p className="overline" style={{ color: "var(--acc)" }}>Alarm</p>
+        <p className="mt-4 text-xl font-medium">{alarm.name || "Alarm"}</p>
+        <p className="num mt-4 text-[clamp(3rem,10vw,6rem)] leading-none font-semibold">
+          {fmtStoredTime(alarm.time, settings.timeFormat === "12")}
+        </p>
+        <p className="mt-4 text-sm text-mut num">
+          Now {p.h}:{p.m}:{p.s}{p.ap && " " + p.ap} · {repeatLabel(alarm.days)}
+        </p>
+        <div className="mt-9 flex flex-col sm:flex-row gap-3 justify-center">
+          <button className="btn" onClick={onSnooze}><Icon name="alarm" size={15} /> Snooze 5 min</button>
+          <button className="btn btn-primary alarm-stop" onClick={onDismiss}><Icon name="x" size={15} /> Stop</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+function TimerDoneBanner({ timer, onStop, onRestart }) {
+  return (
+    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-[65] panel px-5 py-4 flex items-center gap-4 max-w-[calc(100vw-32px)]"
+      style={{ boxShadow: "var(--shadow)", animation: "rise .35s ease both" }} role="status">
+      <span className="text-acc"><Icon name="alarm" size={20} /></span>
+      <div className="min-w-0">
+        <div className="text-sm font-medium">Timer finished</div>
+        <div className="text-xs text-mut truncate">{timer.name || "Timer"} · {fmtDur(timer.durationMs)}</div>
+      </div>
+      <div className="flex gap-2 shrink-0">
+        <button className="btn" onClick={onStop}>Stop</button>
+        <button className="btn btn-primary" onClick={onRestart}>Restart</button>
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+   APP SHELL
+   ================================================================ */
+function App() {
+  const [settings, setSettings] = usePersisted("settings", DEFAULT_SETTINGS);
+  const [timers, setTimers] = usePersisted("timers", [], true);
+  const [alarms, setAlarms] = usePersisted("alarms", []);
+  const [ringingAlarm, setRingingAlarm] = useState(null);
+  const [fs, setFs] = useState(false);
+  const [toasts, setToasts] = useState([]);
+  const route = useRoute();
+
+  const update = (patch) => setSettings(s => ({ ...s, ...patch }));
+  const push = (msg, icon) => {
+    const id = Date.now() + Math.random();
+    setToasts(t => [...t.slice(-3), { id, msg, icon }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 2800);
+  };
+  const notify = (title, body) => { if (settings.notify) sendNotify(title, body); };
+
+  useEffect(() => { document.documentElement.dataset.theme = settings.theme; }, [settings.theme]);
+
+  // ---- per-route SEO title / description ----
+  useEffect(() => {
+    const m = META[route] || META["/"];
+    document.title = m[0];
+    const d = document.querySelector('meta[name="description"]');
+    if (d && m[1]) d.setAttribute("content", m[1]);
+    window.scrollTo({ top: 0 });
+  }, [route]);
+
+  /* ================= TIMER ENGINE (timestamp-based, drift-free) ================= */
+  const endRefs = useRef({});
+  const clearEnd = (id) => { if (endRefs.current[id]) { clearTimeout(endRefs.current[id]); delete endRefs.current[id]; } };
+  const patchT = (id, fn) => setTimers(ts => ts.map(t => t.id === id ? fn(t) : t));
+
+  const tapi = useMemo(() => ({
+    add(name, durationMs) {
+      let out = null;
+      setTimers(ts => {
+        if (ts.length >= 8) return ts;
+        const id = "t" + Date.now() + Math.random().toString(36).slice(2, 6);
+        out = id;
+        return [...ts, { id, name: name || "Timer", durationMs, remainingMs: durationMs, running: false, completed: false, notified: false, silenced: false }];
+      });
+      if (out === null) push("Timer limit reached (8)", "info");
+      return out;
+    },
+    remove(id) { clearEnd(id); setTimers(ts => ts.filter(t => t.id !== id)); },
+    rename(id, name) { patchT(id, t => ({ ...t, name })); },
+    start(id) {
+      AudioEngine.ensure();
+      setTimers(ts => ts.map(t => {
+        if (t.id !== id) return t;
+        clearEnd(id);
+        const rem = t.remainingMs > 0 ? t.remainingMs : t.durationMs;
+        if (rem <= 0) return t;
+        const endAt = Date.now() + rem;
+        endRefs.current[id] = setTimeout(() => {
+          setTimers(x => x.map(y => y.id === id ? { ...y, running: false, remainingMs: 0, completed: true, notified: false } : y));
+        }, rem + 40);
+        return { ...t, running: true, endAt, remainingMs: rem, completed: false, notified: false, silenced: false };
+      }));
+    },
+    pause(id) {
+      clearEnd(id);
+      setTimers(ts => ts.map(t => t.id === id && t.running
+        ? { ...t, running: false, remainingMs: Math.max(0, t.endAt - Date.now()) } : t));
+    },
+    reset(id) {
+      clearEnd(id);
+      patchT(id, t => ({ ...t, running: false, remainingMs: t.durationMs, completed: false, notified: false, silenced: false }));
+    },
+    silence(id) { patchT(id, t => ({ ...t, silenced: true })); },
+  }), []);
+
+  // tick loop for running timers (display) + snap on tab return
+  const anyRunning = timers.some(t => t.running);
+  useEffect(() => {
+    if (!anyRunning) return;
+    const id = setInterval(() => {
+      setTimers(ts => ts.map(t => {
+        if (!t.running) return t;
+        const rem = t.endAt - Date.now();
+        return rem <= 0 ? { ...t, running: false, remainingMs: 0, completed: true, notified: false } : { ...t, remainingMs: rem };
+      }));
+    }, 250);
+    const onVis = () => setTimers(ts => ts.map(t => t.running ? { ...t, remainingMs: Math.max(0, t.endAt - Date.now()) } : t));
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(id); document.removeEventListener("visibilitychange", onVis); };
+  }, [anyRunning]);
+
+  // catch timers that finished while the page was closed
+  useEffect(() => {
+    setTimers(ts => ts.some(t => t.running && t.endAt && t.endAt <= Date.now())
+      ? ts.map(t => t.running && t.endAt <= Date.now() ? { ...t, running: false, remainingMs: 0, completed: true, notified: true } : t)
+      : ts);
+  }, []);
+
+  // one-time desktop notification per completion
+  useEffect(() => {
+    for (const t of timers) {
+      if (t.completed && !t.notified) {
+        notify("Timer finished", (t.name || "Timer") + " · countdown complete");
+        patchT(t.id, x => ({ ...x, notified: true }));
+      }
+    }
+  }, [timers]);
+
+  /* ================= ALARM ENGINE ================= */
+  const alarmsRef = useRef(alarms);
+  useEffect(() => { alarmsRef.current = alarms; }, [alarms]);
+  const ringRef = useRef(null);
+  ringRef.current = ringingAlarm;
+
+  const aapi = useMemo(() => ({
+    add(a) { setAlarms(ts => [...ts, { ...a, id: "a" + Date.now(), enabled: true }]); },
+    update(id, patch) { setAlarms(ts => ts.map(a => a.id === id ? { ...a, ...patch } : a)); },
+    remove(id) { setAlarms(ts => ts.filter(a => a.id !== id)); },
+    toggle(id) { setAlarms(ts => ts.map(a => a.id === id ? { ...a, enabled: !a.enabled } : a)); },
+  }), []);
+
+  const checkAlarms = () => {
+    if (ringRef.current) return;
+    const now = new Date();
+    for (const a of alarmsRef.current) {
+      if (!a.enabled) continue;
+      let fire = false, key = null;
+      if (a.snoozeAt) {
+        if (now.getTime() >= a.snoozeAt) { fire = true; key = "snooze-" + a.snoozeAt; }
+      } else {
+        const hh = +a.time.slice(0, 2), mm = +a.time.slice(3, 5);
+        key = now.toDateString() + " " + pad(hh) + ":" + pad(mm);
+        if (hh === now.getHours() && mm === now.getMinutes() && a.lastFired !== key
+          && (!a.days || !a.days.length || a.days.includes(now.getDay()))) fire = true;
+      }
+      if (fire) {
+        setAlarms(ts => ts.map(x => x.id === a.id ? { ...x, lastFired: key, snoozeAt: null } : x));
+        setRingingAlarm({ ...a });
+        notify("Alarm — " + (a.name || "Alarm"), "It's " + fmtStoredTime(a.time, settings.timeFormat === "12"));
+        break;
+      }
+    }
+  };
+  useEffect(() => {
+    const id = setInterval(checkAlarms, 1000);
+    const onVis = () => checkAlarms();
+    document.addEventListener("visibilitychange", onVis);
+    checkAlarms();
+    return () => { clearInterval(id); document.removeEventListener("visibilitychange", onVis); };
+  }, []);
+  // guaranteed wake-up even when background tabs are heavily throttled
+  useEffect(() => {
+    let tm;
+    const schedule = () => {
+      if (tm) clearTimeout(tm);
+      const nowMs = Date.now();
+      let best = Infinity;
+      for (const a of alarmsRef.current) {
+        if (!a.enabled) continue;
+        if (a.snoozeAt && a.snoozeAt >= nowMs) best = Math.min(best, a.snoozeAt);
+        const occ = nextAlarmOccurrence(a, new Date(nowMs));
+        if (occ) best = Math.min(best, occ.getTime());
+      }
+      if (best < Infinity) tm = setTimeout(() => { checkAlarms(); schedule(); }, Math.max(0, best - nowMs) + 80);
+    };
+    schedule();
+    return () => tm && clearTimeout(tm);
+  }, [alarms]);
+
+  /* ================= RINGING SOUND LOOP ================= */
+  const ringingTimer = timers.find(t => t.completed && !t.silenced);
+  const ringing = !!ringingAlarm || !!ringingTimer;
+  useEffect(() => {
+    if (!ringing || !settings.sound) return;
+    const play = () => ringingAlarm ? AudioEngine.tone(ringingAlarm.tone || "chime") : AudioEngine.tone("digital");
+    play();
+    const id = setInterval(play, 1900);
+    return () => clearInterval(id);
+  }, [ringing, settings.sound, ringingAlarm && ringingAlarm.id, ringingTimer && ringingTimer.id]);
+
+  const ctxValue = {
+    settings, update, setSettings, push, notify,
+    timers, tapi, alarms, aapi, openFS: () => setFs(true),
+  };
+
+  let page;
+  if (route === "/clock") page = <ClockPage openFS={() => setFs(true)} />;
+  else if (route === "/timer") page = <TimerPage />;
+  else if (route === "/stopwatch") page = <StopwatchPage />;
+  else if (route === "/alarm") page = <AlarmPage />;
+  else if (route === "/world") page = <WorldPage />;
+  else if (route === "/settings") page = <SettingsPage />;
+  else if (route === "/about") page = <AboutPage />;
+  else if (route === "/contact") page = <ContactPage />;
+  else if (route === "/privacy") page = <PrivacyPage />;
+  else if (route === "/terms") page = <TermsPage />;
+  else page = <Home openFS={() => setFs(true)} />;
+
+  return (
+    <Ctx.Provider value={ctxValue}>
+      <div className="min-h-screen flex flex-col">
+        <Nav route={route} />
+        <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6">{page}</main>
+        <Footer />
+      </div>
+
+      {fs && <FullscreenClock onClose={() => setFs(false)} />}
+      {ringingAlarm && (
+        <AlarmRinging alarm={ringingAlarm}
+          onSnooze={() => {
+            const a = ringingAlarm; setRingingAlarm(null);
+            setAlarms(ts => ts.map(x => x.id === a.id ? { ...x, snoozeAt: Date.now() + 5 * 60000 } : x));
+            push("Snoozed for 5 minutes", "alarm");
+          }}
+          onDismiss={() => setRingingAlarm(null)} />
+      )}
+      {ringingTimer && (
+        <TimerDoneBanner timer={ringingTimer}
+          onStop={() => tapi.silence(ringingTimer.id)}
+          onRestart={() => { tapi.reset(ringingTimer.id); tapi.start(ringingTimer.id); }} />
+      )}
+      <Toasts items={toasts} />
+    </Ctx.Provider>
+  );
+}
+
+class Boundary extends React.Component {
+  constructor(p) { super(p); this.state = { err: null }; }
+  static getDerivedStateFromError(e) { return { err: e }; }
+  render() {
+    if (this.state.err) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6" style={{ background: "var(--bg)" }}>
+          <div className="panel p-8 max-w-md text-center">
+            <h1 className="text-lg font-semibold mb-2">Something went wrong</h1>
+            <p className="text-sm text-mut mb-5">The app hit an unexpected error. Your saved settings are safe.</p>
+            <button className="btn btn-primary" onClick={() => location.reload()}>Reload DarkClock Pro</button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<Boundary><App /></Boundary>);
+</script>
+</body>
+</html>
